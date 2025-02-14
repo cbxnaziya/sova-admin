@@ -13,6 +13,7 @@ import {
   PageIcon,
   PieChartIcon,
   PlugInIcon,
+  SettingIcon,
   TableIcon,
   UserCircleIcon,
 } from "../icons";
@@ -73,9 +74,27 @@ const navItems: NavItem[] = [
   },
 
   {
-    name: "Forms",
+    name: "Contact Us",
     icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    path: "/form-elements",
+    // subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+  },
+
+  {
+    icon: <UserCircleIcon />,
+    name: "Header",
+    path: "/profile",
+  },
+  {
+    icon: <UserCircleIcon />,
+    name: "Footer",
+    path: "/profile",
+  },
+    {
+    icon: <SettingIcon/> ,
+    
+    name: "Setting",
+    path: "/profile",
   },
 ];
 
@@ -376,17 +395,18 @@ const AppSidebar: React.FC = () => {
                     : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
+                {/* {isExpanded || isHovered || isMobileOpen ? (
                   "Others"
                 ) : (
                   <HorizontaLDots />
-                )}
+                )} */}
               </h2>
+            
               {renderMenuItems(othersItems, "others")}
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+        {/* {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null} */}
       </div>
     </aside>
   );
