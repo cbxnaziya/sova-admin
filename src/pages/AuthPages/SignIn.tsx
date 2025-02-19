@@ -22,7 +22,7 @@ export default function SignIn() {
     try{      
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`,{email,password})
 if(response.data.success){
-toast
+
 }
 
       console.log("response",response);

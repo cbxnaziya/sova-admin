@@ -83,7 +83,7 @@ const navItems: NavItem[] = [
   {
     icon: <UserCircleIcon />,
     name: "Header",
-    path: "/profile",
+    path: "/header",
   },
   {
     icon: <UserCircleIcon />,
