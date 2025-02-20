@@ -35,8 +35,8 @@ const navItems: NavItem[] = [
   },
   {
     icon: <GridIcon />,
-    name: "Sales",
-    path: "/"
+    name: "Users",
+    path: "/users"
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
@@ -52,7 +52,7 @@ const navItems: NavItem[] = [
   {
     name: "Customers",
     icon: <TableIcon />,
-    path: "/basic-tables"
+    path: "/customers"
     // subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
   },
   {
@@ -88,7 +88,7 @@ const navItems: NavItem[] = [
   {
     icon: <UserCircleIcon />,
     name: "Footer",
-    path: "/profile",
+    path: "/footer",
   },
     {
     icon: <SettingIcon/> ,

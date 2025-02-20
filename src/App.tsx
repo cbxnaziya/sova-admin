@@ -17,11 +17,20 @@ import Images from "./pages/UiElements/Images";
 import Videos from "./pages/UiElements/Videos";
 import UserProfiles from "./pages/UserProfiles";
 import Header from "./pages/Header/Header";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Footer from "./components/Footer";
+import Users from "./pages/Users/Users";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js"; // Ensure Bootstrap JS is loaded
+import Customers from "./pages/Customers/Customers";
+
 
 export default function App() {
   return (
     <>
       <Router>
+       <ToastContainer  autoClose={3000} />
         <Routes>
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
@@ -33,6 +42,9 @@ export default function App() {
 
 {/* NEw Routes */}
             <Route path="/header" element={<Header />} />
+            <Route path="/footer" element={<Footer />} />
+            <Route path="/users" element={<Users/>} /> 
+            <Route path="/customers" element={<Customers/>} /> 
 
             {/* Forms */}
             <Route path="/form-elements" element={<FormElements />} />

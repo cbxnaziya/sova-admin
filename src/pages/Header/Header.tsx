@@ -1,6 +1,12 @@
 import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+import HeaderTop from "../../components/HeaderTop";
+import HeaderMain from "../../components/HeaderMain";
+import { toast } from "react-toastify";
+
+
+
 interface SocialIcon {
   name: string;
   url: string;
@@ -16,6 +22,7 @@ interface HeaderData {
 }
 
 export default function HeaderSettings() {
+
   const [headerData, setHeaderData] = useState<HeaderData>({
     title: "E-commerce Admin Panel",
     logo: null,
@@ -28,7 +35,7 @@ export default function HeaderSettings() {
     selectedLanguage: "English",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>  {
     const { name, value } = e.target;
     setHeaderData({ ...headerData, [name]: value });
   };
@@ -39,11 +46,51 @@ export default function HeaderSettings() {
     setHeaderData({ ...headerData, navLinks: updatedLinks });
   };
 
+  const handleAddNavLink = () => {
+    setHeaderData({ ...headerData, navLinks: [...headerData.navLinks, "New Link"] });
+  };
+
+  const handleRemoveNavLink = (index: number) => {
+    const updatedLinks = headerData.navLinks.filter((_, i) => i !== index);
+    setHeaderData({ ...headerData, navLinks: updatedLinks });
+  };
+
+  // const handleSocialChange = (index: number, field: keyof SocialIcon, value: string) => {
+  //   const updatedIcons = [...headerData.socialIcons];
+  //   updatedIcons[index] = { ...updatedIcons[index], [field]: value };
+  //   setHeaderData({ ...headerData, socialIcons: updatedIcons });
+  // };
+
   const handleSocialChange = (index: number, field: keyof SocialIcon, value: string) => {
     const updatedIcons = [...headerData.socialIcons];
-    updatedIcons[index] = { ...updatedIcons[index], [field]: value };
+  
+    if (field === "url") {
+      // Extract the platform name based on the URL
+      const platformNames: { [key: string]: string } = {
+        facebook: "Facebook",
+        twitter: "Twitter",
+        instagram: "Instagram",
+        linkedin: "LinkedIn",
+        youtube: "YouTube",
+      };
+  
+      let newName = updatedIcons[index].name; // Default to existing name
+  
+      // Check if the URL contains any known social media names
+      Object.keys(platformNames).forEach((key) => {
+        if (value.toLowerCase().includes(key)) {
+          newName = platformNames[key];
+        }
+      });
+  
+      updatedIcons[index] = { ...updatedIcons[index], url: value, name: newName };
+    } else {
+      updatedIcons[index] = { ...updatedIcons[index], [field]: value };
+    }
+  
     setHeaderData({ ...headerData, socialIcons: updatedIcons });
   };
+  
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "logo" | "social", index?: number) => {
     const file = e.target.files?.[0];
@@ -63,128 +110,53 @@ export default function HeaderSettings() {
   const handleAddSocialIcon = () => {
     setHeaderData({
       ...headerData,
-      socialIcons: [...headerData.socialIcons, { name: "New Social", url: "", icon: null }],
+      socialIcons: [...headerData.socialIcons, { name: "", url: "", icon: null }],
     });
   };
-
+  
   const handleRemoveSocialIcon = (index: number) => {
     const updatedIcons = headerData.socialIcons.filter((_, i) => i !== index);
     setHeaderData({ ...headerData, socialIcons: updatedIcons });
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Updated Header Data:", headerData);
-    alert("Header settings updated successfully!");
+  const handleSave = () => {
+    console.log("Saved Data:", headerData);
+    toast.success("Operation successful! 🎉");
+    alert("Header settings saved successfully!");
   };
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("English");
 
+    
+  // const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleLanguageChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      console.log("Selected language:", e.target.value);
+      setSelectedLanguage(e.target.value);
+    // Your existing logic
+  };
+  
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Update Header Settings</h2>
-      
-      <form onSubmit={handleSubmit}>
-        <div className="card mb-4">
-          <div className="card-header bg-dark text-white">Header Top Section</div>
-          <div className="card-body">
-            <div className="mb-3">
-              <label className="form-label">Social Media Links</label>
-              {headerData.socialIcons.map((icon, index) => (
-                <div key={index} className="mb-3">
-                  <label className="form-label">{icon.name} Icon</label>
-                  <div className="d-flex align-items-center gap-2">
-                    {icon.icon && <img src={icon.icon} alt="Social Icon" width="40" height="40" />}
-                    <input
-                      type="file"
-                      className="form-control"
-                      accept="image/*"
-                      onChange={(e) => handleFileChange(e, "social", index)}
-                    />
-                  </div>
-                  <div className="d-flex gap-2">
-                    <input
-                      type="text"
-                      className="form-control mt-2"
-                      value={icon.url}
-                      onChange={(e) => handleSocialChange(index, "url", e.target.value)}
-                      placeholder={`Enter ${icon.name} URL`}
-                    />
-                    <button type="button" className="btn btn-danger mt-2" onClick={() => handleRemoveSocialIcon(index)}>
-                      ❌
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button type="button" className="btn btn-secondary mt-2" onClick={handleAddSocialIcon}>
-                ➕ Add More
-              </button>
-            </div>
 
-            <div className="mb-3">
-              <label className="form-label">Select Language</label>
-              <select
-                className="form-select"
-                name="selectedLanguage"
-                value={headerData.selectedLanguage}
-                onChange={handleChange}
-              >
-                <option value="English">English</option>
-                <option value="French">French</option>
-                <option value="Spanish">Spanish</option>
-                <option value="German">German</option>
-              </select>
-            </div>
-          </div>
-        </div>
+{/*  add here save btn */}
+   {/* Save Button */}
+   <div className="d-flex justify-content-end">
+    
+   <button className="btn btn-success mb-3" onClick={handleSave}>
+      Save
+    </button>
+   </div>
 
-        {/* Main Header Section */}
-        <div className="card">
-          <div className="card-header bg-primary text-white">Main Header Section</div>
-          <div className="card-body">
-            <div className="mb-3">
-              <label className="form-label">Header Title</label>
-              <input
-                type="text"
-                className="form-control"
-                name="title"
-                value={headerData.title}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Logo</label>
-              <div className="d-flex align-items-center gap-2">
-                {headerData.logo && <img src={headerData.logo} alt="Logo" width="60" />}
-                <input
-                  type="file"
-                  className="form-control"
-                  accept="image/*"
-                  onChange={(e) => handleFileChange(e, "logo")}
-                />
-              </div>
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Navigation Links</label>
-              {headerData.navLinks.map((link, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  className="form-control mb-2"
-                  value={link}
-                  onChange={(e) => handleNavLinkChange(index, e.target.value)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="text-end mt-3">
-          <button type="submit" className="btn btn-success">
-            💾 Save Changes
-          </button>
-        </div>
-      </form>
+      <HeaderTop
+  {...headerData}
+  handleChange={handleChange}
+  handleFileChange={handleFileChange}
+  handleSocialChange={handleSocialChange}
+  handleAddSocialIcon={handleAddSocialIcon}
+  handleRemoveSocialIcon={handleRemoveSocialIcon}
+  handleLanguageChange={handleLanguageChange}
+  selectedLanguage={selectedLanguage}
+/>
+   <HeaderMain {...headerData} handleChange={handleChange} handleFileChange={handleFileChange} handleNavLinkChange={handleNavLinkChange} handleAddNavLink={handleAddNavLink} handleRemoveNavLink={handleRemoveNavLink} />
     </div>
   );
 }
