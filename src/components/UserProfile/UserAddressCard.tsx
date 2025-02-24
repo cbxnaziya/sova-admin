@@ -26,7 +26,7 @@ export default function UserAddressCard() {
                   Country
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  United States
+                India
                 </p>
               </div>
 
@@ -35,7 +35,7 @@ export default function UserAddressCard() {
                   City/State
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  Phoenix, Arizona, United States
+          Noida, uttar pradesh
                 </p>
               </div>
 

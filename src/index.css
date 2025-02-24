@@ -7,6 +7,8 @@
 @layer base {
   body {
     @apply relative text-base font-normal z-1 bg-gray-50 font-outfit;
+
+    
   }
 }
 
@@ -62,9 +64,17 @@
   .menu-item {
     @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-theme-sm;
   }
-  .menu-item-active {
+  /* .menu-item-active {
     @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+  } */
+  .menu-item-active {
+    @apply bg-[#edaeb7] text-[#dd0927] dark:bg-[#dd0927]/[0.12] dark:text-[#dd0927];
   }
+  
+  /* .menu-item-active:hover {
+    @apply bg-[#f51030];
+  } */
+  
   .menu-item-inactive {
     @apply text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300;
   }
@@ -72,7 +82,7 @@
     @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400;
   }
   .menu-item-icon-active {
-    @apply text-brand-500 dark:text-brand-400;
+    @apply text-[#dd0927] dark:text-[#dd0927];
   }
   .menu-item-icon-inactive {
     @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300;
@@ -92,7 +102,8 @@
     @apply relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-theme-sm font-medium;
   }
   .menu-dropdown-item-active {
-    @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+    /* @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400; */
+    @apply bg-[#edaeb7] text-[#dd0927] dark:bg-[#dd0927]/[0.12] dark:text-[#dd0927];
   }
   .menu-dropdown-item-inactive {
     @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
@@ -606,4 +617,27 @@ span.flatpickr-weekday,
 }
 .fc.fc-media-screen {
   @apply min-h-screen;
+}
+
+/* .toaster{
+  z-index: 3 !important;
+  margin-top: 100px;
+}
+.Toastify__toast{
+  z-index: 20000000 !important;
+}
+
+.layout-main{
+  z-index: 1  !important;
+} */
+
+header {
+  position: fixed;
+  z-index: 1000; /* Lower than the ToastContainer */
+}
+
+.toaster {
+  position: fixed;
+  /* top: 20px; */
+  z-index: 9999; /* Higher than the header */
 }

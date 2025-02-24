@@ -10,6 +10,7 @@ import {
   GridIcon,
   HorizontaLDots,
   ListIcon,
+  LockIcon,
   PageIcon,
   PieChartIcon,
   PlugInIcon,
@@ -34,16 +35,22 @@ const navItems: NavItem[] = [
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
-    icon: <GridIcon />,
+    icon: <UserCircleIcon />,
     name: "Users",
     path: "/users"
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
-    icon: <CalenderIcon />,
-    name: "Catalogs",
-    path: "/calendar",
+    icon: <LockIcon />,
+    name: "Roles",
+    path: "/roles"
+    // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
+  // {
+  //   icon: <CalenderIcon />,
+  //   name: "Catalogs",
+  //   path: "/calendar",
+  // },
   {
     icon: <CalenderIcon />,
     name: "G L B",
@@ -76,7 +83,7 @@ const navItems: NavItem[] = [
   {
     name: "Contact Us",
     icon: <ListIcon />,
-    path: "/form-elements",
+    path: "/contact",
     // subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
   },
 
@@ -351,7 +358,7 @@ const AppSidebar: React.FC = () => {
               />
               <img
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/images/logo/logo.png"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -359,7 +366,7 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <img
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/logo.png"
               alt="Logo"
               width={32}
               height={32}

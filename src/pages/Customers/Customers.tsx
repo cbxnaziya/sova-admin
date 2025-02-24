@@ -65,6 +65,10 @@ export default function Customers() {
 
   return (
     <div className="table-responsive">
+
+<h3 className=" text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
+       All Customers
+        </h3>
       <table className="table table-striped table-bordered">
         <thead>
           <tr>

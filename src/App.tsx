@@ -24,13 +24,15 @@ import Users from "./pages/Users/Users";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js"; // Ensure Bootstrap JS is loaded
 import Customers from "./pages/Customers/Customers";
+import Roles from "./pages/Roles/Roles";
+import Contact from "./pages/Contact/Contact";
 
 
 export default function App() {
   return (
     <>
       <Router>
-       <ToastContainer  autoClose={3000} />
+       <ToastContainer  autoClose={3000} className="toaster"   style={{ zIndex: 999999 }}  />
         <Routes>
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
@@ -40,11 +42,13 @@ export default function App() {
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/blank" element={<Blank />} />
 
-{/* NEw Routes */}
+{/* New Routes */}
             <Route path="/header" element={<Header />} />
             <Route path="/footer" element={<Footer />} />
             <Route path="/users" element={<Users/>} /> 
             <Route path="/customers" element={<Customers/>} /> 
+            <Route path="/roles" element={<Roles/>} /> 
+            <Route path="/contact" element={<Contact/>} /> 
 
             {/* Forms */}
             <Route path="/form-elements" element={<FormElements />} />
