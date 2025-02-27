@@ -1,149 +1,128 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 interface User {
   id: number;
   image: string;
   name: string;
+  company: string;
+  account_name: string;
   role: string;
   email: string;
+  phone: string;
+  country: string;
   status: string;
 }
 
-const usersData: User[] = [
-  {
-    id: 1,
-    image: "/images/user/user-17.jpg",
-    name: "Lindsey Curtis",
-    role: "Web Designer",
-    email: "lindsey@example.com",
-    status: "Active",
-  },
-  {
-    id: 2,
-    image: "/images/user/user-18.jpg",
-    name: "Kaiya George",
-    role: "Project Manager",
-    email: "kaiya@example.com",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    image: "/images/user/user-19.jpg",
-    name: "Zain Geidt",
-    role: "Content Writer",
-    email: "zain@example.com",
-    status: "Inactive",
-  },
-];
-
 export default function Users() {
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [users, setUsers] = useState(usersData);
+  const [users, setUsers] = useState<User[]>([]);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
 
-  const handleEdit = (id: number) => {
-    setEditingId(id);
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/admin/api/users/all", {
+        headers: {
+          Authorization: `Bearer YOUR_ACCESS_TOKEN`,
+        },
+      })
+      .then((response) => setUsers(response.data.users))
+      .catch((error) => console.error("Error fetching users:", error));
+  }, []);
+
+  const handleEdit = (user: User) => setEditingUser(user);
+
+  const handleSave = async () => {
+    if (editingUser) {
+      try {
+        await axios.put(
+          `http://localhost:5000/admin/api/users/${editingUser.id}`,
+          editingUser,
+          {
+            headers: {
+              Authorization: `Bearer YOUR_ACCESS_TOKEN`,
+            },
+          }
+        );
+        setUsers(users.map((user) => (user.id === editingUser.id ? editingUser : user)));
+        setEditingUser(null);
+      } catch (error) {
+        console.error("Error updating user:", error);
+      }
+    }
   };
 
-  const handleSave = (id: number, updatedUser: User) => {
-    setUsers(users.map((user) => (user.id === id ? updatedUser : user)));
-    setEditingId(null);
-  };
-
-  const handleStatusToggle = (id: number) => {
-    setUsers(
-      users.map((user) =>
-        user.id === id
-          ? { ...user, status: user.status === "Active" ? "Inactive" : "Active" }
-          : user
-      )
-    );
-  };
-
-  const handleDelete = (id: number) => {
-    setUsers(users.filter((user) => user.id !== id));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (editingUser) {
+      setEditingUser({ ...editingUser, [e.target.name]: e.target.value });
+    }
   };
 
   return (
-    
     <div className="table-responsive">
-          <h3 className=" text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
-       All Users
-        </h3>
-      <table className="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Role</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) =>
-            editingId === user.id ? (
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">All Users</h3>
+      {editingUser ? (
+        <div className="card p-4">
+          <h4>Edit User</h4>
+          <input
+            type="text"
+            name="company"
+            value={editingUser.company}
+            onChange={handleChange}
+            className="form-control mb-2"
+          />
+          <input
+            type="text"
+            name="account_name"
+            value={editingUser.account_name}
+            onChange={handleChange}
+            className="form-control mb-2"
+          />
+          <input
+            type="email"
+            name="email"
+            value={editingUser.email}
+            onChange={handleChange}
+            className="form-control mb-2"
+          />
+          <input
+            type="phone"
+            name="phone"
+            value={editingUser.phone}
+            onChange={handleChange}
+            className="form-control mb-2"
+          />
+          <input
+            type="country"
+            name="country"
+            value={editingUser.country}
+            onChange={handleChange}
+            className="form-control mb-2"
+          />
+          <button className="btn btn-primary" onClick={handleSave}>
+            Save
+          </button>
+        </div>
+      ) : (
+        <table className="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Account Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
               <tr key={user.id}>
-                <td>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue={user.name}
-                    onChange={(e) => (user.name = e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue={user.role}
-                    onChange={(e) => (user.role = e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="email"
-                    className="form-control"
-                    defaultValue={user.email}
-                    onChange={(e) => (user.email = e.target.value)}
-                  />
-                </td>
-                <td>
-                  <button
-                    className={`btn btn-sm ${
-                      user.status === "Active" ? "btn-success" : "btn-danger"
-                    }`}
-                    onClick={() => handleStatusToggle(user.id)}
-                  >
-                    {user.status}
-                  </button>
-                </td>
-                <td>
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => handleSave(user.id, user)}
-                  >
-                    Save
-                  </button>
-                </td>
-              </tr>
-            ) : (
-              <tr key={user.id}>
-                <td>
-                  <img
-                    src={user.image}
-                    alt={user.name}
-                    className="rounded-circle me-2"
-                    width="40"
-                    height="40"
-                  />
-                  {user.name}
-                </td>
-                <td>{user.role}</td>
+                <td>{user.company}</td>
+                <td>{user.account_name}</td>
                 <td>{user.email}</td>
                 <td>
                   <button
                     className={`btn btn-sm ${
-                      user.status === "Active" ? "btn-success" : "btn-danger"
+                      user.status === "active" ? "btn-success" : "btn-danger"
                     }`}
                   >
                     {user.status}
@@ -151,47 +130,29 @@ export default function Users() {
                 </td>
                 <td>
                   <div className="dropdown">
-                    <button
-                      className="btn btn-secondary btn-sm dropdown-toggle"
-                      type="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
+                    <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                       ⋮
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => handleEdit(user.id)}
-                        >
+                        <button className="dropdown-item" onClick={() => handleEdit(user)}>
                           Edit
                         </button>
                       </li>
                       <li>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => handleStatusToggle(user.id)}
-                        >
-                          {user.status === "Active" ? "Mark Inactive" : "Mark Active"}
-                        </button>
+                        <button className="dropdown-item">{user.status === "Active" ? "Mark Inactive" : "Mark Active"}</button>
                       </li>
                       <li>
-                        <button
-                          className="dropdown-item text-danger"
-                          onClick={() => handleDelete(user.id)}
-                        >
-                          Delete
-                        </button>
+                        <button className="dropdown-item text-danger">Delete</button>
                       </li>
                     </ul>
                   </div>
                 </td>
               </tr>
-            )
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

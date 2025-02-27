@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 interface Role {
   id: number;
@@ -7,129 +8,115 @@ interface Role {
   status: string;
 }
 
-const rolesData: Role[] = [
-  { id: 1, name: "Admin", description: "Full access to all settings", status: "Active" },
-  { id: 2, name: "Editor", description: "Can edit content", status: "Pending" },
-  { id: 3, name: "Viewer", description: "Can view content only", status: "Inactive" },
-];
-
 export default function Roles() {
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [roles, setRoles] = useState(rolesData);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
+  const [authToken] = useState(
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjMwNjNlMjNkNzc2NzE1NTExN2YwZCIsImlhdCI6MTc0MDY1Njc2MSwiZXhwIjoxNzQwNjYwMzYxfQ.4Cml5BJS8JEe7ODCmne8iGrlw_ZrV9PoAhpRETJKQa0"
+  );
 
-  const handleEdit = (id: number) => {
-    setEditingId(id);
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/admin/api/roles", {
+        headers: { Authorization: authToken },
+      });
+      setRoles(response.data.roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
   };
 
-  const handleSave = (id: number, updatedRole: Role) => {
-    setRoles(roles.map((role) => (role.id === id ? updatedRole : role)));
-    setEditingId(null);
+  const handleEdit = (role: Role) => setEditingRole({ ...role });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (editingRole) {
+      setEditingRole({ ...editingRole, [e.target.name]: e.target.value });
+    }
   };
 
-  const handleStatusToggle = (id: number) => {
-    setRoles(
-      roles.map((role) =>
-        role.id === id ? { ...role, status: role.status === "Active" ? "Inactive" : "Active" } : role
-      )
-    );
-  };
-
-  const handleDelete = (id: number) => {
-    setRoles(roles.filter((role) => role.id !== id));
+  const handleSave = async () => {
+    if (!editingRole) return;
+    try {
+      await axios.put(`http://localhost:5000/admin/api/roles/${editingRole.id}`, editingRole, {
+        headers: { Authorization: authToken },
+      });
+      setRoles(roles.map((role) => (role.id === editingRole.id ? editingRole : role)));
+      setEditingRole(null);
+    } catch (error) {
+      console.error("Error updating role:", error);
+    }
   };
 
   return (
-    
     <div className="table-responsive">
-          <h3 className=" text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
-       All Roles
-        </h3>
-      <table className="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Role</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {roles.map((role) =>
-            editingId === role.id ? (
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">All Roles</h3>
+      {editingRole ? (
+        <div className="card p-4">
+          <h4 className="mb-3">Edit Role</h4>
+          <div className="mb-3">
+            <label className="form-label">Role Name</label>
+            <input type="text" className="form-control" name="name" value={editingRole.name} onChange={handleChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Description</label>
+            <input type="text" className="form-control" name="description" value={editingRole.description} onChange={handleChange} />
+          </div>
+          <button className="btn btn-primary" onClick={handleSave}>Update</button>
+        </div>
+      ) : (
+        <table className="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {roles.map((role) => (
               <tr key={role.id}>
-                <td>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue={role.name}
-                    onChange={(e) => (role.name = e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue={role.description}
-                    onChange={(e) => (role.description = e.target.value)}
-                  />
-                </td>
-                <td>
+                <td>{role.name}</td>
+                <td>{role.description}</td>
+                {/* <td>
+                  <span className={`badge ${role.status === "Active" ? "bg-success" : "bg-danger"}`}>{role.status}</span>
+                </td> */}
+                 <td>
                   <button
-                    className={`btn btn-sm ${role.status === "Active" ? "btn-success" : "btn-danger"}`}
-                    onClick={() => handleStatusToggle(role.id)}
+                    className={`btn btn-sm ${
+                      role.status === "active" ? "btn-success" : "btn-danger"
+                    }`}
                   >
                     {role.status}
                   </button>
                 </td>
                 <td>
-                  <button className="btn btn-primary btn-sm" onClick={() => handleSave(role.id, role)}>
-                    Save
+
+                  <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" >  ⋮
                   </button>
-                </td>
-              </tr>
-            ) : (
-              <tr key={role.id}>
-                <td>{role.name}</td>
-                <td>{role.description}</td>
-                <td>
-                  <button className={`btn btn-sm ${role.status === "Active" ? "btn-success" : "btn-danger"}`}>
-                    {role.status}
-                  </button>
-                </td>
-                <td>
-                  <div className="dropdown">
-                    <button
-                      className="btn btn-secondary btn-sm dropdown-toggle"
-                      type="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      ⋮
-                    </button>
-                    <ul className="dropdown-menu">
+                  <ul className="dropdown-menu">
                       <li>
-                        <button className="dropdown-item" onClick={() => handleEdit(role.id)}>
+                        <button className="dropdown-item" onClick={() => handleEdit(role)}>
                           Edit
                         </button>
                       </li>
                       <li>
-                        <button className="dropdown-item" onClick={() => handleStatusToggle(role.id)}>
-                          {role.status === "Active" ? "Mark Inactive" : "Mark Active"}
-                        </button>
+                        <button className="dropdown-item">{role.status === "Active" ? "Mark Inactive" : "Mark Active"}</button>
                       </li>
                       <li>
-                        <button className="dropdown-item text-danger" onClick={() => handleDelete(role.id)}>
-                          Delete
-                        </button>
+                        <button className="dropdown-item text-danger">Delete</button>
                       </li>
                     </ul>
-                  </div>
                 </td>
               </tr>
-            )
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

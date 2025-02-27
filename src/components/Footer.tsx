@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 
@@ -33,15 +34,25 @@ interface SocialLink {
 }
 
 export default function Footer() {
-//   const [footerData, setFooterData] = useState({
-//     logoUrl: "",
-//     socialLinks: [] as SocialLink[],
-//     quickLinks: [] as LinkItem[],
-//     supermarketLinks: [] as LinkItem[],
-//     shelvingLinks: [] as LinkItem[],
-//     copyright: `\u00A9 ${new Date().getFullYear()} MyEcommerce. All Rights Reserved.`,
-//   });
-const [footerData, setFooterData] = useState<FooterData>({
+  // Fetch footer data from API
+  useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/admin/api/footer");
+        console.log("response",response.data.footer);
+
+        
+        // setFooterData(response.data);
+      } catch (error) {
+        console.error("Error fetching footer data:", error);
+        toast.error("Failed to load footer data.");
+      }
+    };
+
+    fetchFooterData();
+  }, []);
+const [footerData, setFooterData] = useState<FooterData>(
+  {
     logoUrl: "",
     socialLinks: [
       { icon: "/images/facebook.png", url: "https://facebook.com" },
@@ -73,7 +84,8 @@ const [footerData, setFooterData] = useState<FooterData>({
       description: "Stay updated with our latest products, offers, and news.",
     },
     copyright: `© ${new Date().getFullYear()} MyEcommerce. All Rights Reserved.`,
-  });
+  }
+  );
   
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, key: keyof typeof footerData) => {
@@ -201,20 +213,18 @@ const [footerData, setFooterData] = useState<FooterData>({
         </div>
         <hr className="bg-light" />
 {/* Dynamic Links Sections */}
-{(["quickLinks", "supermarketLinks", "shelvingLinks"] as (keyof FooterData)[]).map((key, i) => (
+ {(["quickLinks", "supermarketLinks", "shelvingLinks"] as (keyof FooterData)[]).map((key, i) => (
   <div key={key} className="row mb-3 border-1 p-2 rounded">
     <div className="text-dark">
       Section {i + 1}
     </div>
     <div className="col-md-6">
-      {/* Section Title Input */}
       <input
         type="text"
         className="form-control mb-2"
         value={(footerData[key] as Section).title}
         onChange={(e) => handleTitleChange(key, e.target.value)}
       />
-      {/* Links Management */}
       {(footerData[key] as Section).links.map((link, index) => (
         <div key={index} className="d-flex align-items-center mb-2">
           <input
@@ -241,7 +251,7 @@ const [footerData, setFooterData] = useState<FooterData>({
       </button>
     </div>
   </div>
-))}
+))} 
 
 {/* Subscribe to Our Newsletter Section */}
 <div className="row mb-3 border-1 p-2 rounded">
