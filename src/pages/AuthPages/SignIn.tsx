@@ -29,7 +29,6 @@ export default function SignIn() {
       const response = await 
       fetchHandler(SIGN_IN, {email,password}, true, setLoader, "POST");
       // axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`,{email,password})
-      console.log("response",response);
 
       
 if(response.data.success){
@@ -42,7 +41,6 @@ if(response.data.success){
   
 }
 
-console.log("response",response);
 } catch(error:any){
   
   toast.error(error.response.data.message)

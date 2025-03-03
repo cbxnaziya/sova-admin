@@ -47,7 +47,6 @@ const getData = async () =>{
   try{
 
     const response = await fetchHandler(GET_HEADER_CONTENT, "", true, setLoader, "GET")
-    console.log("res....",response);
     setHeaderData(response?.data?.header[0])
     
   } catch(error){

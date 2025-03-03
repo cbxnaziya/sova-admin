@@ -39,7 +39,6 @@ export default function Footer() {
     const fetchFooterData = async () => {
       try {
         const response = await axios.get("http://localhost:5000/admin/api/footer");
-        console.log("response",response.data.footer);
 
         
         // setFooterData(response.data);

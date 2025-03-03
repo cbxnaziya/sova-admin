@@ -52,7 +52,7 @@ interface HeaderMainProps {
                 </button>
               </div>
             ))} */}
-            {navLinks.map((link, index) => (
+            {navLinks && navLinks.map((link, index) => (
   <div key={link._id} className="d-flex gap-2 mb-2">
     <input
       type="text"
@@ -63,6 +63,7 @@ interface HeaderMainProps {
     />
     <input
       type="text"
+      readOnly
       className="form-control"
       value={link.url} // Update to use link.url
       onChange={(e:any) => handleNavLinkChange(index, "url")}

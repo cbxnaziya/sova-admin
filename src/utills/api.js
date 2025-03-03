@@ -28,7 +28,6 @@ ApiServiceWithLoader.interceptors.request.use(
   async (config) => {
     const token = getAuthToken(); // Fetch token from localStorage
     if (token) {
-      console.log("Attached token",token);
       
       config.headers["Authorization"] = `Bearer ${token}`;
     }

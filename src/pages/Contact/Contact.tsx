@@ -98,7 +98,6 @@ export default function Contact() {
         headers: { Authorization: authToken },
       });
 
-      console.log("API Response:", response.data.forms); // Debugging: check what API returns
 
       if (Array.isArray(response.data.forms)) {
         setSubmissions(response?.data.forms);
@@ -149,8 +148,8 @@ export default function Contact() {
           </thead>
           <tbody>
             {submissions.length > 0 ? (
-              submissions.map((submission) => (
-                <tr key={submission.id}>
+              submissions.map((submission,i) => (
+                <tr key={i}>
                   <td>{submission.name}</td>
                   <td>{submission.email}</td>
                   <td>{submission.message}</td>

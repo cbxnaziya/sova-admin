@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 interface User {
   id: number;
+  _id: number;
   image: string;
   name: string;
   company: string;
@@ -17,6 +19,7 @@ interface User {
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   useEffect(() => {
     axios
@@ -34,8 +37,8 @@ export default function Users() {
   const handleSave = async () => {
     if (editingUser) {
       try {
-        await axios.put(
-          `http://localhost:5000/admin/api/users/${editingUser.id}`,
+        const response = await axios.put(
+          `http://localhost:5000/admin/api/users/${editingUser._id}`,
           editingUser,
           {
             headers: {
@@ -43,7 +46,8 @@ export default function Users() {
             },
           }
         );
-        setUsers(users.map((user) => (user.id === editingUser.id ? editingUser : user)));
+        toast.success(response.data.message);
+        setUsers(users.map((user) => (user._id === editingUser._id ? editingUser : user)));
         setEditingUser(null);
       } catch (error) {
         console.error("Error updating user:", error);
@@ -51,9 +55,49 @@ export default function Users() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (editingUser) {
-      setEditingUser({ ...editingUser, [e.target.name]: e.target.value });
+  const handleStatusToggle = async (userId: number, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/admin/api/users/${userId}`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer YOUR_ACCESS_TOKEN`,
+          },
+        }
+      );
+
+      toast.success(response.data.message);
+
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === userId ? { ...user, status: newStatus } : user
+        )
+      );
+    } catch (error) {
+      console.error("Error updating user status:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (userToDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:5000/admin/api/users/${userToDelete._id}`,
+          {
+            headers: {
+              Authorization: `Bearer YOUR_ACCESS_TOKEN`,
+            },
+          }
+        );
+        toast.success(response.data.message);
+        setUsers(users.filter((user) => user._id !== userToDelete._id));
+      } catch (error) {
+        console.error("Error deleting user:", error);
+      }
+      setUserToDelete(null);
     }
   };
 
@@ -63,44 +107,10 @@ export default function Users() {
       {editingUser ? (
         <div className="card p-4">
           <h4>Edit User</h4>
-          <input
-            type="text"
-            name="company"
-            value={editingUser.company}
-            onChange={handleChange}
-            className="form-control mb-2"
-          />
-          <input
-            type="text"
-            name="account_name"
-            value={editingUser.account_name}
-            onChange={handleChange}
-            className="form-control mb-2"
-          />
-          <input
-            type="email"
-            name="email"
-            value={editingUser.email}
-            onChange={handleChange}
-            className="form-control mb-2"
-          />
-          <input
-            type="phone"
-            name="phone"
-            value={editingUser.phone}
-            onChange={handleChange}
-            className="form-control mb-2"
-          />
-          <input
-            type="country"
-            name="country"
-            value={editingUser.country}
-            onChange={handleChange}
-            className="form-control mb-2"
-          />
-          <button className="btn btn-primary" onClick={handleSave}>
-            Save
-          </button>
+          <input type="text" name="company" value={editingUser.company} onChange={(e) => setEditingUser({ ...editingUser, company: e.target.value })} className="form-control mb-2" />
+          <input type="text" name="account_name" value={editingUser.account_name} onChange={(e) => setEditingUser({ ...editingUser, account_name: e.target.value })} className="form-control mb-2" />
+          <input type="email" name="email" value={editingUser.email} onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })} className="form-control mb-2" />
+          <button className="btn btn-danger" onClick={handleSave}>Save</button>
         </div>
       ) : (
         <table className="table table-striped table-bordered">
@@ -114,17 +124,13 @@ export default function Users() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
+            {users.map((user, i) => (
+              <tr key={i}>
                 <td>{user.company}</td>
                 <td>{user.account_name}</td>
                 <td>{user.email}</td>
                 <td>
-                  <button
-                    className={`btn btn-sm ${
-                      user.status === "active" ? "btn-success" : "btn-danger"
-                    }`}
-                  >
+                  <button className={`btn btn-sm ${user.status === "active" ? "btn-success" : "btn-danger"}`} onClick={() => handleStatusToggle(user._id, user.status)}>
                     {user.status}
                   </button>
                 </td>
@@ -135,15 +141,15 @@ export default function Users() {
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <button className="dropdown-item" onClick={() => handleEdit(user)}>
-                          Edit
+                        <button className="dropdown-item" onClick={() => handleEdit(user)}>Edit</button>
+                      </li>
+                      <li>
+                        <button className="dropdown-item" onClick={() => handleStatusToggle(user._id, user.status)}>
+                          {user.status === "active" ? "Mark Inactive" : "Mark Active"}
                         </button>
                       </li>
                       <li>
-                        <button className="dropdown-item">{user.status === "Active" ? "Mark Inactive" : "Mark Active"}</button>
-                      </li>
-                      <li>
-                        <button className="dropdown-item text-danger">Delete</button>
+                        <button className="dropdown-item text-danger" onClick={() => setUserToDelete(user)}>Delete</button>
                       </li>
                     </ul>
                   </div>
@@ -153,6 +159,26 @@ export default function Users() {
           </tbody>
         </table>
       )}
+     {userToDelete && (
+  <div className="modal fade show d-block" tabIndex={-1} style={{ background: "rgba(0, 0, 0, 0.5)" }}>
+    <div className="modal-dialog modal-dialog-centered">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h5 className="modal-title">Confirm Delete</h5>
+          <button type="button" className="btn-close" onClick={() => setUserToDelete(null)}></button>
+        </div>
+        <div className="modal-body">
+          <p>Are you sure you want to delete {userToDelete.account_name}?</p>
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-secondary" onClick={() => setUserToDelete(null)}>Cancel</button>
+          <button type="button" className="btn btn-danger" onClick={handleDelete}>Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
