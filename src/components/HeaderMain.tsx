@@ -1,7 +1,12 @@
+interface NavLink {
+  name: string;
+  url: string;
+  _id: string | null;
+}
 interface HeaderMainProps {
     title: string;
     logo: string | null;
-    navLinks: string[];
+    navLinks: NavLink[];
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleFileChange: (e: React.ChangeEvent<HTMLInputElement>, type: "logo") => void;
     handleNavLinkChange: (index: number, value: string) => void;
@@ -23,10 +28,10 @@ interface HeaderMainProps {
       <div className="card">
         <div className="card-header bg-dark  text-white">Main Header Section</div>
         <div className="card-body">
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <label className="form-label">Header Title</label>
             <input type="text" className="form-control" name="title" value={title} onChange={handleChange} />
-          </div>
+          </div> */}
   
           <div className="mb-3">
             <label className="form-label">Logo</label>
@@ -38,7 +43,7 @@ interface HeaderMainProps {
   
           <div className="mb-3">
             <label className="form-label">Navigation Links</label>
-            {navLinks.map((link, index) => (
+            {/* {navLinks.map((link, index) => (
               <div key={index} className="d-flex gap-2 mb-2">
                 <input type="text" className="form-control" value={link} onChange={(e) => handleNavLinkChange(index, e.target.value)} />
                 <button type="button" className="btn btn-danger" onClick={() => handleRemoveNavLink(index)}>
@@ -46,7 +51,33 @@ interface HeaderMainProps {
 
                 </button>
               </div>
-            ))}
+            ))} */}
+            {navLinks.map((link, index) => (
+  <div key={link._id} className="d-flex gap-2 mb-2">
+    <input
+      type="text"
+      className="form-control"
+      value={link.name} // Update to use link.name
+      // onChange={(e:any) => handleNavLinkChange(index, "name")}
+      placeholder="Enter link name"
+    />
+    <input
+      type="text"
+      className="form-control"
+      value={link.url} // Update to use link.url
+      onChange={(e:any) => handleNavLinkChange(index, "url")}
+      placeholder="Enter link URL"
+    />
+    <button
+      type="button"
+      className="btn btn-danger"
+      onClick={() => handleRemoveNavLink(index)}
+    >
+      &times;
+    </button>
+  </div>
+))}
+
             <button type="button" className="btn btn-secondary mt-2" onClick={handleAddNavLink}>
               ➕ Add More
             </button>

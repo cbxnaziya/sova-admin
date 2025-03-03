@@ -8,12 +8,15 @@ import Button from "../../components/ui/button/Button";
 import axios from "axios";
 import PageMeta from "../../components/common/PageMeta";
 import { toast } from "react-toastify";
+import { fetchHandler } from "../../utills/api";
+import { SIGN_IN } from "../../utills/endpoint";
 
 export default function SignIn() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [email,setEmail] = useState("")
-  const [password,setPassword] = useState("")
+  const [loader, setLoader] = useState(false);
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
 
 
 
@@ -22,27 +25,34 @@ export default function SignIn() {
 
 
     try{      
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`,{email,password})
+      
+      const response = await 
+      fetchHandler(SIGN_IN, {email,password}, true, setLoader, "POST");
+      // axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`,{email,password})
       console.log("response",response);
+
       
 if(response.data.success){
   toast.success(response.data.message)
-
+  localStorage.setItem("token", response.data.token); 
   setTimeout(()=>{
-
+    
     navigate("/")
   },1000)
-
+  
 }
 
-      console.log("response",response);
-    } catch(error){
-      console.log("error",error);
+console.log("response",response);
+} catch(error:any){
+  
+  toast.error(error.response.data.message)
+      console.log("error",error.response.data.message);
 
     } 
     
     
   }
+
 
   return (
     <>
@@ -131,7 +141,7 @@ if(response.data.success){
           <GridShape />
           <div className="flex flex-col items-center max-w-xs">
             <Link to="/" className="block mb-4">
-              <img src="./images/logo/logo2.png" alt="Logo" />
+              <img src="./images/logo/logo.png" alt="Logo" />
             </Link>
             <p className="text-center text-gray-400 dark:text-white/60">
             3D Web Experiences

@@ -1,32 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import HeaderTop from "../../components/HeaderTop";
 import HeaderMain from "../../components/HeaderMain";
 import { toast } from "react-toastify";
+import { fetchHandler } from "../../utills/api";
+import { GET_HEADER_CONTENT } from "../../utills/endpoint";
 
 
 
 interface SocialIcon {
   name: string;
   url: string;
-  icon: string | null;
+  icon?: string | null;
+}
+interface NavLink {
+  name: string;
+  url: string;
+  _id: string | null;
 }
 
 interface HeaderData {
   title: string;
   logo: string | null;
-  navLinks: string[];
+  navLinks: NavLink[];
   socialIcons: SocialIcon[];
   selectedLanguage: string;
 }
 
 export default function HeaderSettings() {
-
+  const [loader, setLoader] = useState(false)
   const [headerData, setHeaderData] = useState<HeaderData>({
     title: "E-commerce Admin Panel",
     logo: null,
-    navLinks: ["Home", "Products", "Orders", "Customers"],
+    navLinks: [ { name: "Home", url: "", _id: "123" }],
+    // ["Home", "Products", "Orders", "Customers"],
     socialIcons: [
       { name: "Facebook", url: "", icon: null },
       { name: "Twitter", url: "", icon: null },
@@ -35,19 +43,43 @@ export default function HeaderSettings() {
     selectedLanguage: "English",
   });
 
+const getData = async () =>{
+  try{
+
+    const response = await fetchHandler(GET_HEADER_CONTENT, "", true, setLoader, "GET")
+    console.log("res....",response);
+    setHeaderData(response?.data?.header[0])
+    
+  } catch(error){
+           console.log("Error",error);           
+  }
+  
+}
+   useEffect(()=>{
+               getData();
+   },[])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>  {
     const { name, value } = e.target;
     setHeaderData({ ...headerData, [name]: value });
   };
 
-  const handleNavLinkChange = (index: number, value: string) => {
-    const updatedLinks = [...headerData.navLinks];
-    updatedLinks[index] = value;
-    setHeaderData({ ...headerData, navLinks: updatedLinks });
+  // const handleNavLinkChange = (index: number, value: string) => {
+    // const updatedLinks = [...headerData.navLinks];
+    // updatedLinks[index] = value;
+    // setHeaderData({ ...headerData, navLinks: updatedLinks });
+  // };
+  const handleNavLinkChange = (index: number, field: string) => {
+    // setNavLinks((prevLinks:any) =>
+    //   prevLinks.map((link:any, i:any) =>
+    //     i === index ? { ...link, [field]: value } : link
+    //   )  
+    // );
   };
+  
 
   const handleAddNavLink = () => {
-    setHeaderData({ ...headerData, navLinks: [...headerData.navLinks, "New Link"] });
+    // setHeaderData({ ...headerData, navLinks: [...headerData.navLinks, "New Link"] });
   };
 
   const handleRemoveNavLink = (index: number) => {
@@ -135,7 +167,7 @@ export default function HeaderSettings() {
   
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">Update Header Settings</h2>
+      <h2 className="mb-4">Update Header Settings </h2>
 
 {/*  add here save btn */}
    {/* Save Button */}
@@ -154,7 +186,7 @@ export default function HeaderSettings() {
   handleAddSocialIcon={handleAddSocialIcon}
   handleRemoveSocialIcon={handleRemoveSocialIcon}
   handleLanguageChange={handleLanguageChange}
-  selectedLanguage={selectedLanguage}
+  // selectedLanguage={selectedLanguage}
 />
    <HeaderMain {...headerData} handleChange={handleChange} handleFileChange={handleFileChange} handleNavLinkChange={handleNavLinkChange} handleAddNavLink={handleAddNavLink} handleRemoveNavLink={handleRemoveNavLink} />
     </div>
