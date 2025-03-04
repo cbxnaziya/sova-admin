@@ -75,6 +75,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 interface ContactSubmission {
+  _id: string;
   id: number;
   name: string;
   email: string;
@@ -111,18 +112,18 @@ export default function Contact() {
     }
   };
 
-  const handleStatusToggle = async (id: number, currentStatus: string) => {
-    const newStatus = currentStatus === "New" ? "Resolved" : "New";
+  const handleStatusToggle = async (id: string, newStatus: string) => {
+    // const newStatus = currentStatus === "New" ? "Resolved" : "New";
     try {
-      await axios.patch(
-        `http://localhost:5000/admin/api/contact/${id}/status`,
+      await axios.put(
+        `http://localhost:5000/admin/api/contact/update/${id}`,
         { status: newStatus },
         { headers: { Authorization: authToken } }
       );
 
       setSubmissions((prevSubmissions) =>
         prevSubmissions.map((submission) =>
-          submission.id === id ? { ...submission, status: newStatus } : submission
+          submission._id === id ? { ...submission, status: newStatus } : submission
         )
       );
     } catch (error) {
@@ -159,13 +160,33 @@ export default function Contact() {
                     </span>
                   </td>
                   <td>
+                  <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    ⋮
+                  </button>
+                  <ul className="dropdown-menu">
+                    <li>
+                      <button className="dropdown-item" onClick={() => {handleStatusToggle(submission._id,"new")}}>Mark New</button>
+                      <li>
+                        <button className="dropdown-item" onClick={() => {handleStatusToggle(submission._id,"pending")}}
+                      >
+                Mark Pending
+                        </button>  
+                      </li>
+                    </li>
+                    <li>
+                          <button className="dropdown-item" onClick={() => {handleStatusToggle(submission._id,"resolved")}}>Mark Resolved</button>
+                      {/* <button className="dropdown-item text-danger" onClick={() => confirmDelete(role._id)}>Delete</button> */}
+                    </li>
+                  </ul>
+                </td>
+                  {/* <td>
                     <button
                       className="btn btn-sm btn-primary"
                       onClick={() => handleStatusToggle(submission.id, submission.status)}
                     >
                       {submission.status === "New" ? "Mark Resolved" : "Mark New"}
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))
             ) : (

@@ -1,77 +1,126 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-interface User {
+interface Role {
   id: number;
-  _id: number;
-  image: string;
+  _id: string;
   name: string;
-  company: string;
-  account_name: string;
-  role: string;
   email: string;
   phone: string;
-  country: string;
+  password: string;
+  description: string;
   status: string;
 }
 
 export default function Users() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const authToken = localStorage.getItem("token"); // Check auth token
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
+  const [addRole, setAddRole] = useState<Role>({ id: 0, _id: "", name: "",email:"",phone:"",password:"", description: "", status: "active" });
+  const [addRoleForm, setAddRoleForm] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
+  // const [authToken] = useState("Bearer YOUR_ACCESS_TOKEN");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/admin/api/users/all", {
-        headers: {
-          Authorization: `Bearer YOUR_ACCESS_TOKEN`,
-        },
-      })
-      .then((response) => setUsers(response.data.users))
-      .catch((error) => console.error("Error fetching users:", error));
+    fetchRoles();
   }, []);
 
-  const handleEdit = (user: User) => setEditingUser(user);
-
-  const handleSave = async () => {
-    if (editingUser) {
-      try {
-        const response = await axios.put(
-          `http://localhost:5000/admin/api/users/${editingUser._id}`,
-          editingUser,
-          {
-            headers: {
-              Authorization: `Bearer YOUR_ACCESS_TOKEN`,
-            },
-          }
-        );
-        toast.success(response.data.message);
-        setUsers(users.map((user) => (user._id === editingUser._id ? editingUser : user)));
-        setEditingUser(null);
-      } catch (error) {
-        console.error("Error updating user:", error);
-      }
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/admin/api/users/all", {
+        headers: { Authorization: authToken },
+      });
+      setRoles(response.data.users);
+    } catch (error:any) {
+      toast.error(error.response.data.message)
+      console.error("Error fetching roles:", error);
     }
   };
 
-  const handleStatusToggle = async (userId: number, currentStatus: string) => {
-    const newStatus = currentStatus === "active" ? "inactive" : "active";
+  const handleEdit = (role: Role) => setEditingRole({ ...role });
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (editingRole) {
+      setAddRole({ ...editingRole, [e.target.name]: e.target.value });
+    }
+  };
+
+  const handleSave = async () => {
+    if (!editingRole) return;
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/admin/api/users/${editingRole._id}`,
+        editingRole,
+        { headers: { Authorization: authToken } }
+      );
+      toast.success(response.data.message);
+      setRoles(roles.map((role) => (role._id === editingRole._id ? editingRole : role)));
+      setEditingRole(null);
+    } catch (error) {
+      console.error("Error updating role:", error);
+    }
+  };
+
+  const handleAdd = async () => {
+    console.log("add role",addRole);
+    
+    if (!addRole) return;
+    try {
+      const response = await axios.post(
+        `http://localhost:5000/admin/api/users/add`,
+        addRole,
+        { headers: { Authorization: authToken } }
+      );
+      setAddRoleForm(false)
+      toast.success(response.data.message);
+      setRoles([...roles, addRole]);
+      setEditingRole(null);
+    } catch (error:any) {
+      toast.error(error.response.data.message)
+      console.error("Error updating role:", error);
+    }
+  };
+
+  const confirmDelete = (id: string) => {
+    setRoleToDelete(id);
+  };
+
+  const handleDelete = async () => {
+    if (!roleToDelete) return;
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/admin/api/users/${roleToDelete}`,
+        { headers: { Authorization: authToken } }
+      );
+      toast.success(response.data.message);
+      setRoles(roles.filter((role) => role._id !== roleToDelete));
+    } catch (error) {
+      console.error("Error deleting role:", error);
+    } finally {
+      setRoleToDelete(null);
+    }
+  };
+
+  const handleStatusToggle = async (userId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+       console.log(userId,currentStatus,"userId");
+       
     try {
       const response = await axios.put(
         `http://localhost:5000/admin/api/users/${userId}`,
         { status: newStatus },
         {
           headers: {
-            Authorization: `Bearer YOUR_ACCESS_TOKEN`,
+            Authorization: authToken,
           },
         }
       );
 
       toast.success(response.data.message);
 
-      setUsers((prevUsers) =>
+      setRoles((prevUsers) =>
         prevUsers.map((user) =>
           user._id === userId ? { ...user, status: newStatus } : user
         )
@@ -81,104 +130,128 @@ export default function Users() {
     }
   };
 
-  const handleDelete = async () => {
-    if (userToDelete) {
-      try {
-        const response = await axios.delete(
-          `http://localhost:5000/admin/api/users/${userToDelete._id}`,
-          {
-            headers: {
-              Authorization: `Bearer YOUR_ACCESS_TOKEN`,
-            },
-          }
-        );
-        toast.success(response.data.message);
-        setUsers(users.filter((user) => user._id !== userToDelete._id));
-      } catch (error) {
-        console.error("Error deleting user:", error);
-      }
-      setUserToDelete(null);
-    }
-  };
-
   return (
     <div className="table-responsive">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">All Users</h3>
-      {editingUser ? (
-        <div className="card p-4">
+      <h3 className="text-lg font-semibold">All Roles</h3>
+      <div >
+        {
+addRoleForm  || editingRole?
+          <button className="btn btn-dark mb-4 float-right" onClick={()=>{setAddRoleForm(false); setEditingRole(null);}}>Back </button>
+
+       :<button className="btn btn-danger mb-4 float-right" onClick={()=>{setAddRoleForm(true)}}>Add +</button>
+        }
+      </div>
+      {editingRole ? (
+        <div className="card p-4 w-100">
           <h4>Edit User</h4>
-          <input type="text" name="company" value={editingUser.company} onChange={(e) => setEditingUser({ ...editingUser, company: e.target.value })} className="form-control mb-2" />
-          <input type="text" name="account_name" value={editingUser.account_name} onChange={(e) => setEditingUser({ ...editingUser, account_name: e.target.value })} className="form-control mb-2" />
-          <input type="email" name="email" value={editingUser.email} onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })} className="form-control mb-2" />
-          <button className="btn btn-danger" onClick={handleSave}>Save</button>
+          <div className="mb-3">
+            <label className="form-label">User Name</label>
+            <input type="text" className="form-control" name="name" value={editingRole.name} onChange={handleChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">User Email</label>
+            <input type="text" className="form-control" name="email" value={editingRole.email} onChange={handleChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">User Phone</label>
+            <input type="text" className="form-control" name="phone" value={editingRole.phone} onChange={handleChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">User Status  (active/inactive)</label>
+            <input type="text" className="form-control" name="status" value={editingRole.status} onChange={handleChange} />
+          </div>
+     
+          <button className="btn btn-danger" onClick={handleSave}>Update</button>
         </div>
+      ): addRoleForm ? (
+        <div className="card p-4 w-100">
+        <h4>Edit Role</h4>
+        <div className="mb-3">
+          <label className="form-label">User Name</label>
+          <input type="text" className="form-control" name="name" value={addRole?.name} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">User Email</label>
+          <input type="text" className="form-control" name="email" value={addRole?.email} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">User Phone</label>
+          <input type="text" className="form-control" name="phone" value={addRole?.phone} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">User Status</label>
+          <input type="text" className="form-control" name="status" value={addRole?.status} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
+        </div>
+    
+        <button className="btn btn-danger" onClick={handleAdd}>Add</button>
+     
+      </div>
       ) : (
         <table className="table table-striped table-bordered">
           <thead>
             <tr>
-              <th>Company</th>
-              <th>Account Name</th>
+              <th>Name</th>
               <th>Email</th>
+              <th>Phone</th>
+              {/* <th>Password</th> */}
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((user, i) => (
+            {roles.map((role, i) => (
               <tr key={i}>
-                <td>{user.company}</td>
-                <td>{user.account_name}</td>
-                <td>{user.email}</td>
+                <td>{role.name}</td>
+                <td>{role.email}</td>
+                <td>{role.phone}</td>
+                {/* <td>{role.description}</td> */}
                 <td>
-                  <button className={`btn btn-sm ${user.status === "active" ? "btn-success" : "btn-danger"}`} onClick={() => handleStatusToggle(user._id, user.status)}>
-                    {user.status}
+                  <button className={`btn btn-sm ${role.status === "active" ? "btn-success" : "btn-danger"}`}>
+                    {role.status}
                   </button>
                 </td>
                 <td>
-                  <div className="dropdown">
-                    <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                      ⋮
-                    </button>
-                    <ul className="dropdown-menu">
+                  <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    ⋮
+                  </button>
+                  <ul className="dropdown-menu">
+                    <li>
+                      <button className="dropdown-item" onClick={() => handleEdit(role)}>Edit</button>
                       <li>
-                        <button className="dropdown-item" onClick={() => handleEdit(user)}>Edit</button>
+                        <button className="dropdown-item" onClick={() => handleStatusToggle(role._id, role.status)}>
+                          {role.status === "active" ? "Mark Inactive" : "Mark Active"}
+                        </button>  
                       </li>
-                      <li>
-                        <button className="dropdown-item" onClick={() => handleStatusToggle(user._id, user.status)}>
-                          {user.status === "active" ? "Mark Inactive" : "Mark Active"}
-                        </button>
-                      </li>
-                      <li>
-                        <button className="dropdown-item text-danger" onClick={() => setUserToDelete(user)}>Delete</button>
-                      </li>
-                    </ul>
-                  </div>
+                    </li>
+                    <li>
+                      <button className="dropdown-item text-danger" onClick={() => confirmDelete(role._id)}>Delete</button>
+                    </li>
+                  </ul>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
-     {userToDelete && (
-  <div className="modal fade show d-block" tabIndex={-1} style={{ background: "rgba(0, 0, 0, 0.5)" }}>
-    <div className="modal-dialog modal-dialog-centered">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h5 className="modal-title">Confirm Delete</h5>
-          <button type="button" className="btn-close" onClick={() => setUserToDelete(null)}></button>
-        </div>
-        <div className="modal-body">
-          <p>Are you sure you want to delete {userToDelete.account_name}?</p>
-        </div>
-        <div className="modal-footer">
-          <button type="button" className="btn btn-secondary" onClick={() => setUserToDelete(null)}>Cancel</button>
-          <button type="button" className="btn btn-danger" onClick={handleDelete}>Delete</button>
+
+      {/* Delete Confirmation Modal */}
+      <div className={`modal fade  ${roleToDelete ? "show d-block" : "d-none"}`} tabIndex={-1} style={{ background: "rgba(0, 0, 0, 0.5)" }}>
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Confirm Delete</h5>
+              <button type="button" className="btn-close" onClick={() => setRoleToDelete(null)}></button>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to delete this role?</p>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => setRoleToDelete(null)}>Cancel</button>
+              <button type="button" className="btn btn-danger" onClick={handleDelete}>Delete</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-)}
-
     </div>
   );
 }

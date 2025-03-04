@@ -8,14 +8,17 @@ import { GET_USER } from "../../utills/endpoint";
 import { fetchHandler } from "../../utills/api";
 
 export default function UserInfoCard() {
+  const authToken = localStorage.getItem("token"); // Check auth token
   const [loader, setLoader] = useState(false);
   const [isEditing, setIsEditing] = useState(false); // Track edit mode
   const [userData, setUserData] = useState({
     _id:"",
     company: "",
     account_name: "",
+    name:"",
     email: "",
     phone: "",
+    Status:"",
     bio: "",
     facebook: "",
     twitter: "",
@@ -74,7 +77,8 @@ export default function UserInfoCard() {
           </h4>
           <form className="flex flex-col">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-              {["company", "account_name", "email", "phone", ].map((field) => (
+              {["name", "email", "phone", "status", ].map((field) => (
+              // {["company", "account_name", "email", "phone", ].map((field) => (
                 <div key={field} className="col-span-2 lg:col-span-1">
                   <Label>{capitalizeFirstLetter(field.replace("_", " "))}</Label>
                   <Input
@@ -107,7 +111,7 @@ export default function UserInfoCard() {
               </h4>
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
                 {Object.entries(userData).map(([key, value]) =>
-                  ["company", "account_name", "email", "phone"].includes(key) ? (
+                  ["name",  "email", "phone","status"].includes(key) ? (
                     <div key={key}>
                       <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
                         {capitalizeFirstLetter(key.replace("_", " "))}

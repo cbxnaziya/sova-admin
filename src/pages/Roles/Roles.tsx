@@ -3,18 +3,26 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+
+interface Permission {
+  page: string;
+  actions: string[]; // Example: ["view", "create", "edit", "delete"]
+}
+
 interface Role {
   id: number;
   _id: string;
   name: string;
   description: string;
   status: string;
+  permissions: Permission[]; // Updated field for permissions
 }
+
 
 export default function Roles() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
-  const [addRole, setAddRole] = useState<Role>({ id: 0, _id: "", name: "", description: "", status: "active" });
+  const [addRole, setAddRole] = useState<Role>({ id: 0, _id: "", name: "", description: "", status: "active",permissions:[] });
   const [addRoleForm, setAddRoleForm] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
   const [authToken] = useState("Bearer YOUR_ACCESS_TOKEN");
@@ -33,7 +41,47 @@ export default function Roles() {
       console.error("Error fetching roles:", error);
     }
   };
+  const permissionsList = ["view", "create", "edit", "delete"];
+const availablePages = ["User", "Role", "Customer", "Page", "Contact-Form", "Header", "Footer"];
+const handleCheckboxChange = (page: string, action: string) => {
+  setAddRole((prevRole) => {
+    let updatedPermissions = [...prevRole.permissions];
 
+    // Find the index of the page in the permissions array
+    const pageIndex = updatedPermissions.findIndex((p) => p.page === page);
+
+    if (pageIndex !== -1) {
+      // If the page exists, update its actions array
+      let actionsSet = new Set(updatedPermissions[pageIndex].actions);
+
+      if (actionsSet.has(action)) {
+        actionsSet.delete(action); // Remove action if already present
+      } else {
+        actionsSet.add(action); // Add action if not present
+      }
+
+      updatedPermissions[pageIndex] = {
+        ...updatedPermissions[pageIndex],
+        actions: Array.from(actionsSet),
+      };
+
+      // Remove the page if no actions are left
+      if (updatedPermissions[pageIndex].actions.length === 0) {
+        updatedPermissions.splice(pageIndex, 1);
+      }
+    } else {
+      // If the page is not found, add it with the new action
+      updatedPermissions.push({ page, actions: [action] });
+    }
+
+    return { ...prevRole, permissions: updatedPermissions };
+  });
+};
+
+
+
+  
+  
   const handleEdit = (role: Role) => setEditingRole({ ...role });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +118,8 @@ export default function Roles() {
       );
       setAddRoleForm(false)
       toast.success(response.data.message);
-      // setRoles(roles.map((role) => (role._id === editingRole._id ? editingRole : role)));
+      setRoles([...roles, addRole]);
+
       setEditingRole(null);
     } catch (error:any) {
       toast.error(error.response.data.message)
@@ -125,31 +174,112 @@ export default function Roles() {
     }
   };
 
+  const handleCheckboxChangeEdit = (page: string, action: string) => {
+    if (!editingRole) return;
+  
+    setEditingRole((prevRole) => {
+      if (!prevRole) return null;
+  
+      let updatedPermissions = [...prevRole.permissions];
+  
+      const pageIndex = updatedPermissions.findIndex((p) => p.page === page);
+  
+      if (pageIndex !== -1) {
+        let actionsSet = new Set(updatedPermissions[pageIndex].actions);
+  
+        if (actionsSet.has(action)) {
+          actionsSet.delete(action);
+        } else {
+          actionsSet.add(action);
+        }
+  
+        updatedPermissions[pageIndex] = {
+          ...updatedPermissions[pageIndex],
+          actions: Array.from(actionsSet),
+        };
+  
+        if (updatedPermissions[pageIndex].actions.length === 0) {
+          updatedPermissions.splice(pageIndex, 1);
+        }
+      } else {
+        updatedPermissions.push({ page, actions: [action] });
+      }
+  
+      return { ...prevRole, permissions: updatedPermissions };
+    });
+  };
+  
+
   return (
     <div className="table-responsive">
       <h3 className="text-lg font-semibold">All Roles</h3>
       <div >
         {
-addRoleForm ?
-          <button className="btn btn-dark mb-4 float-right" onClick={()=>{setAddRoleForm(false)}}>Back </button>
+addRoleForm || editingRole ?
+          <button className="btn btn-dark mb-4 float-right" onClick={()=>{setAddRoleForm(false); setEditingRole(null)}}>Back </button>
 
        :<button className="btn btn-danger mb-4 float-right" onClick={()=>{setAddRoleForm(true)}}>Add +</button>
         }
       </div>
       {editingRole ? (
-        <div className="card p-4 w-100">
-          <h4>Edit Role</h4>
-          <div className="mb-3">
-            <label className="form-label">Role Name</label>
-            <input type="text" className="form-control" name="name" value={editingRole.name} onChange={handleChange} />
+  <div className="card p-4 w-100">
+    <h4>Edit Role</h4>
+    <div className="mb-3">
+      <label className="form-label">Role Name</label>
+      <input
+        type="text"
+        className="form-control"
+        name="name"
+        value={editingRole.name}
+        onChange={handleChange}
+      />
+    </div>
+    <div className="mb-3">
+      <label className="form-label">Description</label>
+      <input
+        type="text"
+        className="form-control"
+        name="description"
+        value={editingRole.description}
+        onChange={handleChange}
+      />
+    </div>
+
+    <div>
+      {availablePages.map((page) => (
+        <div key={page} className="mb-3 border p-3 rounded">
+          <h5 className="text-dark">{page} Management</h5>
+          <div className="row">
+            {permissionsList.map((action) => (
+              <div key={`${page}-${action}`} className="col-md-3">
+                <div className="form-check">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id={`${page}-${action}`}
+                    checked={
+                      editingRole.permissions.some(
+                        (p) => p.page === page && p.actions.includes(action)
+                      )
+                    }
+                    onChange={() => handleCheckboxChangeEdit(page, action)}
+                  />
+                  <label className="form-check-label" htmlFor={`${page}-${action}`}>
+                    {action.charAt(0).toUpperCase() + action.slice(1)}
+                  </label>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="mb-3">
-            <label className="form-label">Description</label>
-            <input type="text" className="form-control" name="description" value={editingRole.description} onChange={handleChange} />
-          </div>
-          <button className="btn btn-danger" onClick={handleSave}>Update</button>
         </div>
-      ): addRoleForm ? (
+      ))}
+    </div>
+
+    <button className="btn btn-danger" onClick={handleSave}>
+      Update
+    </button>
+  </div>
+): addRoleForm ? (
         <div className="card p-4 w-100">
         <h4>Edit Role</h4>
         <div className="mb-3">
@@ -160,6 +290,33 @@ addRoleForm ?
           <label className="form-label">Description</label>
           <input type="text" className="form-control" name="description" value={addRole?.description}  onChange={(e:any)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}} />
         </div>
+        <div>
+    {availablePages.map((page) => (
+      <div key={page} className="mb-3 border p-3 rounded">
+        <h5 className="text-dark">{page} Management</h5>
+        <div className="row">
+          {permissionsList.map((action) => (
+            <div key={`${page}-${action}`} className="col-md-3">
+              <div className="form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id={`${page}-${action}`}
+                  checked={
+                    addRole.permissions.find((p) => p.page === page)?.actions.includes(action) || false
+                  }
+                  onChange={() => handleCheckboxChange(page, action)}
+                />
+                <label className="form-check-label" htmlFor={`${page}-${action}`}>
+                  {action.charAt(0).toUpperCase() + action.slice(1)}
+                </label>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
         <button className="btn btn-danger" onClick={handleAdd}>Add</button>
      
       </div>
@@ -228,3 +385,5 @@ addRoleForm ?
     </div>
   );
 }
+
+
