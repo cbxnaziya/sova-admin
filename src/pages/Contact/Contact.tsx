@@ -95,7 +95,7 @@ export default function Contact() {
 
   const fetchSubmissions = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/admin/api/contact", {
+      const response = await axios.get("https://sova-admin.cyberxinfosolution.com/admin/api/contact", {
         headers: { Authorization: authToken },
       });
 
@@ -116,7 +116,7 @@ export default function Contact() {
     // const newStatus = currentStatus === "New" ? "Resolved" : "New";
     try {
       await axios.put(
-        `http://localhost:5000/admin/api/contact/update/${id}`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/contact/update/${id}`,
         { status: newStatus },
         { headers: { Authorization: authToken } }
       );

@@ -198,7 +198,7 @@ export default function Customers() {
 
   useEffect(() => {
     axios
-    .get("http://localhost:5000/admin/api/customer/all", {
+    .get("https://sova-admin.cyberxinfosolution.com/admin/api/customer/all", {
     //  .get("http://localhost:5000/admin/api/users/all", {
         headers: {
           Authorization: `Bearer YOUR_ACCESS_TOKEN`,
@@ -214,7 +214,7 @@ export default function Customers() {
     if (editingUser) {
       try {
         const response = await axios.put(
-          `http://localhost:5000/admin/api/customer/${editingUser._id}`,
+          `https://sova-admin.cyberxinfosolution.com/admin/api/customer/${editingUser._id}`,
           editingUser,
           {
             headers: {
@@ -236,7 +236,7 @@ export default function Customers() {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/admin/api/customer/${userId}`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/customer/${userId}`,
         { status: newStatus },
         {
           headers: {
@@ -261,7 +261,7 @@ export default function Customers() {
     if (userToDelete) {
       try {
         const response = await axios.delete(
-          `http://localhost:5000/admin/api/customer/${userToDelete._id}`,
+          `https://sova-admin.cyberxinfosolution.com/admin/api/customer/${userToDelete._id}`,
           {
             headers: {
               Authorization: `Bearer YOUR_ACCESS_TOKEN`,

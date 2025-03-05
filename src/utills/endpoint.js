@@ -1,6 +1,7 @@
 export const SIGN_IN = "/api/auth/login";
 export const SIGN_UP = "/api/auth/signup";
-export const GET_ALL_USERS = "/api/user"; 
+export const GET_ALL_USERS = "/admin/api/users/all"; 
+export const UPDATE_USER = "/admin/api/users"; 
 export const GET_USER = "/admin/api/users"; 
 export const GET_HEADER_CONTENT = "/admin/api/header"; 
 // export const UPDATE_USER = "/api/user/update";

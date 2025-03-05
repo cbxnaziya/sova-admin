@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import HeaderTop from "../../components/HeaderTop";
 import HeaderMain from "../../components/HeaderMain";
 import { toast } from "react-toastify";
-import { fetchHandler } from "../../utills/api";
+import api from "../../utills/api";
 import { GET_HEADER_CONTENT } from "../../utills/endpoint";
 
 
@@ -46,7 +46,8 @@ export default function HeaderSettings() {
 const getData = async () =>{
   try{
 
-    const response = await fetchHandler(GET_HEADER_CONTENT, "", true, setLoader, "GET")
+    const response = await api.get(GET_HEADER_CONTENT);
+    // const response = await fetchHandler(GET_HEADER_CONTENT, "", true, setLoader, "GET")
     setHeaderData(response?.data?.header[0])
     
   } catch(error){

@@ -33,7 +33,7 @@ export default function Roles() {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/admin/api/roles", {
+      const response = await axios.get("https://sova-admin.cyberxinfosolution.com/admin/api/roles", {
         headers: { Authorization: authToken },
       });
       setRoles(response.data.roles);
@@ -86,15 +86,16 @@ const handleCheckboxChange = (page: string, action: string) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (editingRole) {
-      setAddRole({ ...editingRole, [e.target.name]: e.target.value });
+      setEditingRole({ ...editingRole, [e.target.name]: e.target.value });
     }
   };
+  
 
   const handleSave = async () => {
     if (!editingRole) return;
     try {
       const response = await axios.put(
-        `http://localhost:5000/admin/api/roles/${editingRole._id}`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/roles/${editingRole._id}`,
         editingRole,
         { headers: { Authorization: authToken } }
       );
@@ -112,14 +113,14 @@ const handleCheckboxChange = (page: string, action: string) => {
     if (!addRole) return;
     try {
       const response = await axios.post(
-        `http://localhost:5000/admin/api/roles/add`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/roles/add`,
         addRole,
         { headers: { Authorization: authToken } }
       );
       setAddRoleForm(false)
       toast.success(response.data.message);
       setRoles([...roles, addRole]);
-
+setAddRole({ id: 0, _id: "", name: "", description: "", status: "active",permissions:[] })
       setEditingRole(null);
     } catch (error:any) {
       toast.error(error.response.data.message)
@@ -135,7 +136,7 @@ const handleCheckboxChange = (page: string, action: string) => {
     if (!roleToDelete) return;
     try {
       const response = await axios.delete(
-        `http://localhost:5000/admin/api/roles/${roleToDelete}`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/roles/${roleToDelete}`,
         { headers: { Authorization: authToken } }
       );
       toast.success(response.data.message);
@@ -153,7 +154,7 @@ const handleCheckboxChange = (page: string, action: string) => {
        
     try {
       const response = await axios.put(
-        `http://localhost:5000/admin/api/roles/${userId}`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/roles/${userId}`,
         { status: newStatus },
         {
           headers: {
@@ -223,14 +224,14 @@ addRoleForm || editingRole ?
       </div>
       {editingRole ? (
   <div className="card p-4 w-100">
-    <h4>Edit Role</h4>
+    <h4>Edit Role </h4>
     <div className="mb-3">
       <label className="form-label">Role Name</label>
       <input
         type="text"
         className="form-control"
         name="name"
-        value={editingRole.name}
+        value={editingRole?.name || ""}
         onChange={handleChange}
       />
     </div>
@@ -240,7 +241,7 @@ addRoleForm || editingRole ?
         type="text"
         className="form-control"
         name="description"
-        value={editingRole.description}
+        value={editingRole.description || ""}
         onChange={handleChange}
       />
     </div>

@@ -5,7 +5,7 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import { GET_USER } from "../../utills/endpoint";
-import { fetchHandler } from "../../utills/api";
+import api from "../../utills/api";
 
 export default function UserInfoCard() {
   const authToken = localStorage.getItem("token"); // Check auth token
@@ -18,7 +18,7 @@ export default function UserInfoCard() {
     name:"",
     email: "",
     phone: "",
-    Status:"",
+    status:"",
     bio: "",
     facebook: "",
     twitter: "",
@@ -30,7 +30,8 @@ export default function UserInfoCard() {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await fetchHandler(GET_USER, "", true, setLoader, "GET");
+        const response = await api.get(GET_USER);
+        // const response = await fetchHandler(GET_USER, "", true, setLoader, "GET");
         setUserData(response.data);
       } catch (error: any) {
         toast.error(error?.response?.data?.message || "Failed to fetch user data");
@@ -41,7 +42,7 @@ export default function UserInfoCard() {
   }, []);
 
   // Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e : any) => {
     setUserData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -77,18 +78,30 @@ export default function UserInfoCard() {
           </h4>
           <form className="flex flex-col">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-              {["name", "email", "phone", "status", ].map((field) => (
-              // {["company", "account_name", "email", "phone", ].map((field) => (
-                <div key={field} className="col-span-2 lg:col-span-1">
-                  <Label>{capitalizeFirstLetter(field.replace("_", " "))}</Label>
-                  <Input
-                    type="text"
-                    name={field}
-                    value={userData[field as keyof typeof userData]}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              ))}
+            {["name", "email", "phone", "status"].map((field) => (
+  <div key={field} className="col-span-2 lg:col-span-1">
+    <Label>{capitalizeFirstLetter(field.replace("_", " "))}</Label>
+    {field === "status" ? (
+      <select
+        name="status"
+        value={userData?.status}
+        onChange={handleInputChange}
+        className="form-select w-full p-2 border rounded-md"
+      >
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+    ) : (
+      <Input
+        type="text"
+        name={field}
+        value={userData[field as keyof typeof userData]}
+        onChange={handleInputChange}
+      />
+    )}
+  </div>
+))}
+
             </div>
          
             <div className="flex items-center gap-3 mt-6 lg:justify-end">

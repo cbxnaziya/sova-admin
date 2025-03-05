@@ -8,49 +8,36 @@ import Button from "../../components/ui/button/Button";
 import axios from "axios";
 import PageMeta from "../../components/common/PageMeta";
 import { toast } from "react-toastify";
-import { fetchHandler } from "../../utills/api";
+// import { fetchHandler } from "../../utills/api";
 import { SIGN_IN } from "../../utills/endpoint";
+import api from "../../utills/api";
 
 export default function SignIn() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-
-
-  const handleLogin = async (event:any) =>{
+  const handleLogin = async (event: any) => {
     event.preventDefault();
-
-
-    try{      
-      
-      const response = await 
-      fetchHandler(SIGN_IN, {email,password}, true, setLoader, "POST");
+    try {
+      const response = await api.post(SIGN_IN, { email, password });
+      // const response = await fetchHandler( SIGN_IN, { email, password },true,setLoader,"POST");
       // axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`,{email,password})
 
-      
-if(response.data.success){
-  toast.success(response.data.message)
-  localStorage.setItem("token", response.data.token); 
-  setTimeout(()=>{
-    
-    navigate("/")
-  },1000)
-  
-}
-
-} catch(error:any){
-  
-  toast.error(error.response.data.message)
-      console.log("error",error.response.data.message);
-
-    } 
-    
-    
-  }
-
+      if (response.data.success) {
+        toast.success(response.data.message);
+        localStorage.setItem("token", response.data.token);
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      }
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+      console.log("error", error.response.data.message);
+    }
+  };
 
   return (
     <>
@@ -80,7 +67,6 @@ if(response.data.success){
                 </p>
               </div>
               <div>
-      
                 <div className="relative py-3 sm:py-5">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
@@ -97,7 +83,12 @@ if(response.data.success){
                       <Label>
                         Email <span className="text-error-500">*</span>{" "}
                       </Label>
-                      <Input placeholder="info@gmail.com" onChange={(event)=>{setEmail(event.target.value)}} />
+                      <Input
+                        placeholder="info@gmail.com"
+                        onChange={(event) => {
+                          setEmail(event.target.value);
+                        }}
+                      />
                     </div>
                     <div>
                       <Label>
@@ -106,7 +97,9 @@ if(response.data.success){
                       <div className="relative">
                         <Input
                           type={showPassword ? "text" : "password"}
-                          onChange={(event)=>{setPassword(event.target.value)}}
+                          onChange={(event) => {
+                            setPassword(event.target.value);
+                          }}
                           placeholder="Enter your password"
                         />
                         <span
@@ -121,7 +114,7 @@ if(response.data.success){
                         </span>
                       </div>
                     </div>
-       
+
                     <div>
                       <Button className="w-full" size="sm">
                         Sign in
@@ -129,7 +122,6 @@ if(response.data.success){
                     </div>
                   </div>
                 </form>
-
               </div>
             </div>
           </div>
@@ -142,7 +134,7 @@ if(response.data.success){
               <img src="./images/logo/logo.png" alt="Logo" />
             </Link>
             <p className="text-center text-gray-400 dark:text-white/60">
-            3D Web Experiences
+              3D Web Experiences
             </p>
           </div>
         </div>
@@ -150,9 +142,3 @@ if(response.data.success){
     </>
   );
 }
-
-
-
-
-
-

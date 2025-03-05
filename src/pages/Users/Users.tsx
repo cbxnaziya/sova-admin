@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
+import api from "../../utills/api";
+import { GET_ALL_USERS, UPDATE_USER } from "../../utills/endpoint";
 
 interface Role {
   id: number;
@@ -12,52 +14,81 @@ interface Role {
   password: string;
   description: string;
   status: string;
+  role:string;
 }
 
 export default function Users() {
   const authToken = localStorage.getItem("token"); // Check auth token
   const [roles, setRoles] = useState<Role[]>([]);
-  const [editingRole, setEditingRole] = useState<Role | null>(null);
-  const [addRole, setAddRole] = useState<Role>({ id: 0, _id: "", name: "",email:"",phone:"",password:"", description: "", status: "active" });
+  const [editingRole, setEditingRole] = useState<Role | null >(null);
+  const [addRole, setAddRole] = useState<Role>({ id: 0, _id: "", name: "",email:"",phone:"",password:"", description: "", status: "active" ,role:""});
   const [addRoleForm, setAddRoleForm] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
   // const [authToken] = useState("Bearer YOUR_ACCESS_TOKEN");
+  const [availableRoles, setAvailableRoles] = useState<{ _id: string; name: string }[]>([]);
 
   useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await api.get("/admin/api/roles");
+        const activeRoles = response?.data?.roles.filter((role: any) => role.status === "active") || [];
+        setAvailableRoles(activeRoles);
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || "Failed to fetch roles");
+      }
+    };
+    fetchRoles();
+  }, []);
+  
+  
+  useEffect(() => {
+  
+    const fetchRoles = async () => {
+      try {
+        console.time("API Call Duration");
+        // slow 
+        // const response = await fetchHandler( GET_ALL_USERS, "",false,setLoader,"GET");
+        const response = await api.get(GET_ALL_USERS);
+    
+        // very fast fetching the data
+        // const response = await axios.get("http://localhost:5000/admin/api/users/all", {
+        // const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/api/users/all`, {
+        //   headers: { Authorization: authToken },
+        // });
+        console.timeEnd("API Call Duration");
+        setRoles(response?.data?.users);
+      } catch (error:any) {
+        toast.error(error?.response?.data.message)
+        console.error("Error fetching roles:", error);
+      }
+    };
     fetchRoles();
   }, []);
 
-  const fetchRoles = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/admin/api/users/all", {
-        headers: { Authorization: authToken },
-      });
-      setRoles(response.data.users);
-    } catch (error:any) {
-      toast.error(error.response.data.message)
-      console.error("Error fetching roles:", error);
-    }
-  };
-
   const handleEdit = (role: Role) => setEditingRole({ ...role });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: any) => {
+    console.log("test");
+    
     if (editingRole) {
-      setAddRole({ ...editingRole, [e.target.name]: e.target.value });
+      setEditingRole({ ...editingRole, [e.target.name]: e.target.value });
     }
   };
 
   const handleSave = async () => {
     if (!editingRole) return;
     try {
+      // const url =  `${UPDATE_USER}/${editingRole._id}`;
+      // const response = await fetchHandler( url, editingRole,true,setLoader,"PUT");
       const response = await axios.put(
-        `http://localhost:5000/admin/api/users/${editingRole._id}`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/users/${editingRole._id}`,
         editingRole,
         { headers: { Authorization: authToken } }
       );
+      setEditingRole(null);
       toast.success(response.data.message);
       setRoles(roles.map((role) => (role._id === editingRole._id ? editingRole : role)));
-      setEditingRole(null);
     } catch (error) {
       console.error("Error updating role:", error);
     }
@@ -69,7 +100,7 @@ export default function Users() {
     if (!addRole) return;
     try {
       const response = await axios.post(
-        `http://localhost:5000/admin/api/users/add`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/users/add`,
         addRole,
         { headers: { Authorization: authToken } }
       );
@@ -91,7 +122,7 @@ export default function Users() {
     if (!roleToDelete) return;
     try {
       const response = await axios.delete(
-        `http://localhost:5000/admin/api/users/${roleToDelete}`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/users/${roleToDelete}`,
         { headers: { Authorization: authToken } }
       );
       toast.success(response.data.message);
@@ -109,7 +140,7 @@ export default function Users() {
        
     try {
       const response = await axios.put(
-        `http://localhost:5000/admin/api/users/${userId}`,
+        `https://sova-admin.cyberxinfosolution.com/admin/api/users/${userId}`,
         { status: newStatus },
         {
           headers: {
@@ -132,7 +163,7 @@ export default function Users() {
 
   return (
     <div className="table-responsive">
-      <h3 className="text-lg font-semibold">All Roles</h3>
+      <h3 className="text-lg font-semibold">All Users</h3>
       <div >
         {
 addRoleForm  || editingRole?
@@ -143,7 +174,7 @@ addRoleForm  || editingRole?
       </div>
       {editingRole ? (
         <div className="card p-4 w-100">
-          <h4>Edit User</h4>
+          <h4>Edit User </h4>
           <div className="mb-3">
             <label className="form-label">User Name</label>
             <input type="text" className="form-control" name="name" value={editingRole.name} onChange={handleChange} />
@@ -156,16 +187,41 @@ addRoleForm  || editingRole?
             <label className="form-label">User Phone</label>
             <input type="text" className="form-control" name="phone" value={editingRole.phone} onChange={handleChange} />
           </div>
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <label className="form-label">User Status  (active/inactive)</label>
             <input type="text" className="form-control" name="status" value={editingRole.status} onChange={handleChange} />
-          </div>
+          </div> */}
+          <div className="mb-3">
+        <label className="form-label">Status</label>
+        <select name="status" className="form-select" value={editingRole.status} onChange={handleChange}>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+          <div className="mb-3">
+        <label className="form-label">Role</label>
+          <select
+  className="form-control"
+  name="role"
+  value={editingRole.role}
+  // onChange={(e) => setEditingRole({ ...editingRole!, _id: e.target.value })}
+  onChange={handleChange}
+>
+  {/* <option value="">Select Role</option> */}
+  {availableRoles.map((role) => (
+    <option key={role._id} value={role.name}>
+      {role.name}
+    </option>
+  ))}
+</select>
+
+      </div>
      
           <button className="btn btn-danger" onClick={handleSave}>Update</button>
         </div>
       ): addRoleForm ? (
         <div className="card p-4 w-100">
-        <h4>Edit Role</h4>
+        <h4>Add User </h4>
         <div className="mb-3">
           <label className="form-label">User Name</label>
           <input type="text" className="form-control" name="name" value={addRole?.name} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
@@ -178,11 +234,35 @@ addRoleForm  || editingRole?
           <label className="form-label">User Phone</label>
           <input type="text" className="form-control" name="phone" value={addRole?.phone} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
         </div>
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label className="form-label">User Status</label>
           <input type="text" className="form-control" name="status" value={addRole?.status} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
-        </div>
-    
+        </div> */}
+             <div className="mb-3">
+        <label className="form-label">Status</label>
+        <select name="status" className="form-select" value={addRole?.status} onChange={(e:any)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div className="mb-3">
+      <label className="form-label">Role</label>
+      <select
+  className="form-control"
+  name="role"
+  value={addRole.role}
+  // onChange={(e) => setAddRole({ ...addRole, _id: e.target.value })}
+  onChange={(e:any)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}
+>
+  <option value="">Select Role</option>
+  {availableRoles.map((role) => (
+    <option key={role._id} value={role.name}>
+      {role.name}
+    </option>
+  ))}
+</select>
+  </div>
+
         <button className="btn btn-danger" onClick={handleAdd}>Add</button>
      
       </div>
