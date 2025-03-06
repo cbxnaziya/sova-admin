@@ -31,7 +31,7 @@ export default function Users() {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await api.get("/admin/api/roles");
+        const response = await api.get("/admin/api/roles/all");
         const activeRoles = response?.data?.roles.filter((role: any) => role.status === "active") || [];
         setAvailableRoles(activeRoles);
       } catch (error: any) {
@@ -167,9 +167,9 @@ export default function Users() {
       <div >
         {
 addRoleForm  || editingRole?
-          <button className="btn btn-dark mb-4 float-right" onClick={()=>{setAddRoleForm(false); setEditingRole(null);}}>Back </button>
+          <button className="btn btn-secondary mb-4 float-right" onClick={()=>{setAddRoleForm(false); setEditingRole(null);}}>Back </button>
 
-       :<button className="btn btn-danger mb-4 float-right" onClick={()=>{setAddRoleForm(true)}}>Add +</button>
+       :<button className="btn btn-dark mb-4 float-right" onClick={()=>{setAddRoleForm(true)}}>Add +</button>
         }
       </div>
       {editingRole ? (
@@ -187,6 +187,7 @@ addRoleForm  || editingRole?
             <label className="form-label">User Phone</label>
             <input type="text" className="form-control" name="phone" value={editingRole.phone} onChange={handleChange} />
           </div>
+         
           {/* <div className="mb-3">
             <label className="form-label">User Status  (active/inactive)</label>
             <input type="text" className="form-control" name="status" value={editingRole.status} onChange={handleChange} />
@@ -217,7 +218,7 @@ addRoleForm  || editingRole?
 
       </div>
      
-          <button className="btn btn-danger" onClick={handleSave}>Update</button>
+          <button className="btn btn-dark" onClick={handleSave}>Update</button>
         </div>
       ): addRoleForm ? (
         <div className="card p-4 w-100">
@@ -234,6 +235,11 @@ addRoleForm  || editingRole?
           <label className="form-label">User Phone</label>
           <input type="text" className="form-control" name="phone" value={addRole?.phone} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
         </div>
+        <div className="mb-3">
+          <label className="form-label">User Password</label>
+          <input type="text" className="form-control" name="password" value={addRole?.password} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
+        </div>
+
         {/* <div className="mb-3">
           <label className="form-label">User Status</label>
           <input type="text" className="form-control" name="status" value={addRole?.status} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
@@ -263,7 +269,7 @@ addRoleForm  || editingRole?
 </select>
   </div>
 
-        <button className="btn btn-danger" onClick={handleAdd}>Add</button>
+        <button className="btn btn-dark" onClick={handleAdd}>Add</button>
      
       </div>
       ) : (
@@ -286,7 +292,7 @@ addRoleForm  || editingRole?
                 <td>{role.phone}</td>
                 {/* <td>{role.description}</td> */}
                 <td>
-                  <button className={`btn btn-sm ${role.status === "active" ? "btn-success" : "btn-danger"}`}>
+                  <button className={`btn btn-sm ${role.status === "active" ? "btn-outline-success" : "btn-outline-danger"}`}>
                     {role.status}
                   </button>
                 </td>

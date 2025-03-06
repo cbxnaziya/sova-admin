@@ -281,13 +281,19 @@ export default function Customers() {
     <div className="table-responsive">
       <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">All Customers</h3>
       {editingUser ? (
-        <div className="card p-4">
+        <>
+         <div >
+
+                 <button className="btn btn-secondary mb-4 float-right" onClick={()=>{setEditingUser(null)}} >Back </button>
+         </div>
+        <div className="card p-4 w-100">
           <h4>Edit User</h4>
           <input type="text" name="company" value={editingUser.company} onChange={(e) => setEditingUser({ ...editingUser, company: e.target.value })} className="form-control mb-2" />
           <input type="text" name="account_name" value={editingUser.account_name} onChange={(e) => setEditingUser({ ...editingUser, account_name: e.target.value })} className="form-control mb-2" />
           <input type="email" name="email" value={editingUser.email} onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })} className="form-control mb-2" />
-          <button className="btn btn-danger" onClick={handleSave}>Save</button>
+          <button className="btn btn-dark" onClick={handleSave}>Save</button>
         </div>
+        </>
       ) : (
         <table className="table table-striped table-bordered">
           <thead>
@@ -306,7 +312,7 @@ export default function Customers() {
                 <td>{user.account_name}</td>
                 <td>{user.email}</td>
                 <td>
-                  <button className={`btn btn-sm ${user.status === "active" ? "btn-success" : "btn-danger"}`} onClick={() => handleStatusToggle(user._id, user.status)}>
+                  <button className={`btn btn-sm ${user.status === "active" ? "btn-outline-success" : "btn-outline-danger"}`} onClick={() => handleStatusToggle(user._id, user.status)}>
                     {user.status}
                   </button>
                 </td>

@@ -48,7 +48,7 @@ const HeaderTop: React.FC<HeaderTopProps> = ({
 
   return (
     <div className="card mb-4">
-           <div className="card-header bg-dark text-white">Header Top Section</div>
+           <div className="card-header bg-secondary text-white">Header Top Section</div>
            <div className="card-body">
              <div className="mb-3">
                <label className="form-label">Social Media Links</label>

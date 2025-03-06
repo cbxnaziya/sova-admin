@@ -33,7 +33,7 @@ export default function Roles() {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get("https://sova-admin.cyberxinfosolution.com/admin/api/roles", {
+      const response = await axios.get("https://sova-admin.cyberxinfosolution.com/admin/api/roles/all", {
         headers: { Authorization: authToken },
       });
       setRoles(response.data.roles);
@@ -42,7 +42,7 @@ export default function Roles() {
     }
   };
   const permissionsList = ["view", "create", "edit", "delete"];
-const availablePages = ["User", "Role", "Customer", "Page", "Contact-Form", "Header", "Footer"];
+const availablePages = ["Dashboard","User", "Role", "Customer", "Page", "Contact-Form", "Header", "Footer"];
 const handleCheckboxChange = (page: string, action: string) => {
   setAddRole((prevRole) => {
     let updatedPermissions = [...prevRole.permissions];
@@ -217,9 +217,9 @@ setAddRole({ id: 0, _id: "", name: "", description: "", status: "active",permiss
       <div >
         {
 addRoleForm || editingRole ?
-          <button className="btn btn-dark mb-4 float-right" onClick={()=>{setAddRoleForm(false); setEditingRole(null)}}>Back </button>
+          <button className="btn btn-secondary mb-4 float-right" onClick={()=>{setAddRoleForm(false); setEditingRole(null)}}>Back </button>
 
-       :<button className="btn btn-danger mb-4 float-right" onClick={()=>{setAddRoleForm(true)}}>Add +</button>
+       :<button className="btn btn-dark mb-4 float-right" onClick={()=>{setAddRoleForm(true)}}>Add +</button>
         }
       </div>
       {editingRole ? (
@@ -276,13 +276,13 @@ addRoleForm || editingRole ?
       ))}
     </div>
 
-    <button className="btn btn-danger" onClick={handleSave}>
+    <button className="btn btn-dark" onClick={handleSave}>
       Update
     </button>
   </div>
 ): addRoleForm ? (
         <div className="card p-4 w-100">
-        <h4>Edit Role</h4>
+        <h4>Add Role</h4>
         <div className="mb-3">
           <label className="form-label">Role Name</label>
           <input type="text" className="form-control" name="name" value={addRole?.name} onChange={(e)=>{ if(addRole){setAddRole({ ...addRole, [e.target.name]: e.target.value });}}}/>
@@ -318,7 +318,7 @@ addRoleForm || editingRole ?
       </div>
     ))}
   </div>
-        <button className="btn btn-danger" onClick={handleAdd}>Add</button>
+        <button className="btn btn-dark" onClick={handleAdd}>Add</button>
      
       </div>
       ) : (
@@ -337,7 +337,7 @@ addRoleForm || editingRole ?
                 <td>{role.name}</td>
                 <td>{role.description}</td>
                 <td>
-                  <button className={`btn btn-sm ${role.status === "active" ? "btn-success" : "btn-danger"}`}>
+                  <button className={`btn btn-sm ${role.status === "active" ? "btn-outline-success" : "btn-outline-danger"}`}>
                     {role.status}
                   </button>
                 </td>

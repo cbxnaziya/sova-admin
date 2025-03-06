@@ -19,6 +19,7 @@ import {
   UserCircleIcon,
 } from "../icons";
 import SidebarWidget from "./SidebarWidget";
+import api from "../utills/api";
 
 type NavItem = {
   name: string;
@@ -36,13 +37,13 @@ const navItems: NavItem[] = [
   },
   {
     icon: <UserCircleIcon />,
-    name: "Users",
+    name: "User",
     path: "/users"
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
     icon: <LockIcon />,
-    name: "Roles",
+    name: "Role",
     path: "/roles"
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
@@ -57,13 +58,13 @@ const navItems: NavItem[] = [
     path: "/calendar",
   },
   {
-    name: "Customers",
+    name: "Customer",
     icon: <TableIcon />,
     path: "/customers"
     // subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
   },
   {
-    name: "Pages",
+    name: "Page",
     icon: <PageIcon />,
     subItems: [
       { name: "Home", path: "/blank", pro: false },
@@ -81,7 +82,7 @@ const navItems: NavItem[] = [
   },
 
   {
-    name: "Contact Us",
+    name: "Contact-Form",
     icon: <ListIcon />,
     path: "/contact",
     // subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
@@ -148,6 +149,28 @@ const AppSidebar: React.FC = () => {
     {}
   );
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [filteredNavItems, setFilteredNavItems] = useState<NavItem[]>([])
+
+  useEffect(() => {
+    fetchPermissions();
+  }, []);
+
+  const fetchPermissions = async () => {
+    try {
+      const response = await api.get("/admin/api/users/permissions");
+      // setPermissions(response.data.roles);
+      const permissions = response.data.permissions
+      console.log("responseresponse",response);
+      const allowedPages = permissions.map((p:any) => p.page);
+const filteredNavItems = navItems.filter((item) => allowedPages.includes(item.name));
+setFilteredNavItems(filteredNavItems)
+
+console.log(filteredNavItems);
+      
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
 
   const isActive = useCallback(
     (path: string) => location.pathname === path,
@@ -157,7 +180,8 @@ const AppSidebar: React.FC = () => {
   useEffect(() => {
     let submenuMatched = false;
     ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
+      const items = menuType === "main" ? filteredNavItems : othersItems;
+      // const items = menuType === "main" ? navItems : othersItems;
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
@@ -391,7 +415,8 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {renderMenuItems(filteredNavItems, "main")}
+              {/* {renderMenuItems(navItems, "main")} */}
             </div>
 
             <div className="">

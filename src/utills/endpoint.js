@@ -1,4 +1,4 @@
-export const SIGN_IN = "/api/auth/login";
+export const SIGN_IN = "/admin/api/auth/login";
 export const SIGN_UP = "/api/auth/signup";
 export const GET_ALL_USERS = "/admin/api/users/all"; 
 export const UPDATE_USER = "/admin/api/users"; 

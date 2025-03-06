@@ -46,7 +46,7 @@ export default function EcommerceMetrics() {
         <div className="flex items-center justify-center mt-0">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              Total Active Users
+              Total Users
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
               {totalActiveUsers}
@@ -63,7 +63,7 @@ export default function EcommerceMetrics() {
         <div className="flex items-center justify-center mt-0">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              Total Active Customers
+              Total Customers
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
               {totalInactiveUsers}
@@ -80,7 +80,7 @@ export default function EcommerceMetrics() {
         <div className="flex items-center justify-center mt-0">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              Total Available Designs
+              Total Designs
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
               {totalDesigns}
@@ -97,7 +97,7 @@ export default function EcommerceMetrics() {
         <div className="flex items-center justify-center mt-0">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              Total Orders settled
+              Total Orders
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
               {totalOrders}

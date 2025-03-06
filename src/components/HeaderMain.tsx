@@ -26,7 +26,7 @@ interface HeaderMainProps {
   }: HeaderMainProps) {
     return (
       <div className="card">
-        <div className="card-header bg-dark  text-white">Main Header Section</div>
+        <div className="card-header bg-secondary  text-white">Main Header Section</div>
         <div className="card-body">
           {/* <div className="mb-3">
             <label className="form-label">Header Title</label>

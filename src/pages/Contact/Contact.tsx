@@ -73,6 +73,7 @@
 // }
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { capitalizeFirstLetter } from "../../utills/Services";
 
 interface ContactSubmission {
   _id: string;
@@ -156,7 +157,7 @@ export default function Contact() {
                   <td>{submission.message}</td>
                   <td>
                     <span className={`badge ${submission.status === "New" ? "bg-warning" : "bg-success"}`}>
-                      {submission.status}
+                      {capitalizeFirstLetter(submission.status)}
                     </span>
                   </td>
                   <td>

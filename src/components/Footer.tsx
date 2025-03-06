@@ -169,7 +169,7 @@ const [footerData, setFooterData] = useState<FooterData>(
       <div className="container">
    <div className="d-flex justify-content-end">
     
-    <button className="btn btn-success mb-3" onClick={()=>handleSave()}>
+    <button className="btn btn-dark mb-3" onClick={()=>handleSave()}>
        Save
      </button>
     </div>
