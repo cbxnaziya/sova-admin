@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 import api from "../../utills/api";
 import { GET_ALL_USERS, UPDATE_USER } from "../../utills/endpoint";
+import { checkPermission, getPagePermissions } from "../../utills/Services";
+import { useNavigate } from "react-router";
 
 interface Role {
   id: number;
@@ -18,6 +20,7 @@ interface Role {
 }
 
 export default function Users() {
+  const navigate = useNavigate()
   const authToken = localStorage.getItem("token"); // Check auth token
   const [roles, setRoles] = useState<Role[]>([]);
   const [editingRole, setEditingRole] = useState<Role | null >(null);
@@ -27,8 +30,35 @@ export default function Users() {
   const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
   // const [authToken] = useState("Bearer YOUR_ACCESS_TOKEN");
   const [availableRoles, setAvailableRoles] = useState<{ _id: string; name: string }[]>([]);
+  const [permissions, setPermissions] = useState({
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  });
+
+  // useEffect(() => {
+  //   const perms = getPagePermissions("User");
+  //   setPermissions(perms);
+  
+
+  //   if (!perms.canView) {
+  //     navigate("/404", { replace: true });
+  //   }
+  // }, []);
+
 
   useEffect(() => {
+    const perms = getPagePermissions("User");
+    setPermissions(perms);
+    
+    // if (!perms.canView) {
+    //   navigate("/404", { replace: true });
+    // }
+    if (!checkPermission("User")) {
+     navigate("/404"); // Redirect to Page Not Found
+    }
+
     const fetchRoles = async () => {
       try {
         const response = await api.get("/admin/api/roles/all");
@@ -169,7 +199,7 @@ export default function Users() {
 addRoleForm  || editingRole?
           <button className="btn btn-secondary mb-4 float-right" onClick={()=>{setAddRoleForm(false); setEditingRole(null);}}>Back </button>
 
-       :<button className="btn btn-dark mb-4 float-right" onClick={()=>{setAddRoleForm(true)}}>Add +</button>
+       :<button className="btn btn-dark mb-4 float-right" disabled={!permissions.canCreate} onClick={()=>{setAddRoleForm(true)}}>Add + </button>
         }
       </div>
       {editingRole ? (
@@ -297,10 +327,14 @@ addRoleForm  || editingRole?
                   </button>
                 </td>
                 <td>
-                  <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                 
+                 <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                     ⋮
+                 
                   </button>
                   <ul className="dropdown-menu">
+                  {permissions.canEdit && 
+
                     <li>
                       <button className="dropdown-item" onClick={() => handleEdit(role)}>Edit</button>
                       <li>
@@ -309,10 +343,12 @@ addRoleForm  || editingRole?
                         </button>  
                       </li>
                     </li>
-                    <li>
+                  }
+                 {permissions.canDelete &&   <li>
                       <button className="dropdown-item text-danger" onClick={() => confirmDelete(role._id)}>Delete</button>
-                    </li>
+                    </li>}
                   </ul>
+
                 </td>
               </tr>
             ))}

@@ -6,6 +6,8 @@ import HeaderMain from "../../components/HeaderMain";
 import { toast } from "react-toastify";
 import api from "../../utills/api";
 import { GET_HEADER_CONTENT } from "../../utills/endpoint";
+import { checkPermission } from "../../utills/Services";
+import { useNavigate } from "react-router";
 
 
 
@@ -29,6 +31,7 @@ interface HeaderData {
 }
 
 export default function HeaderSettings() {
+  const navigate = useNavigate()
   const [loader, setLoader] = useState(false)
   const [headerData, setHeaderData] = useState<HeaderData>({
     title: "E-commerce Admin Panel",
@@ -56,6 +59,9 @@ const getData = async () =>{
   
 }
    useEffect(()=>{
+        if (!checkPermission("User")) {
+             navigate("/404"); // Redirect to Page Not Found
+            }
                getData();
    },[])
 

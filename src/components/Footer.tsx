@@ -2,6 +2,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { checkPermission } from "../utills/Services";
+import { useNavigate } from "react-router";
 
 
 interface LinkItem {
@@ -34,8 +36,14 @@ interface SocialLink {
 }
 
 export default function Footer() {
+ const navigate = useNavigate()
+
   // Fetch footer data from API
   useEffect(() => {
+
+        if (!checkPermission("User")) {
+             navigate("/404"); // Redirect to Page Not Found
+            }
     const fetchFooterData = async () => {
       try {
         const response = await axios.get("http://localhost:5000/admin/api/footer");

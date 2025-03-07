@@ -84,6 +84,7 @@ export default function SignIn() {
                         Email <span className="text-error-500">*</span>{" "}
                       </Label>
                       <Input
+                      required
                         placeholder="info@gmail.com"
                         onChange={(event) => {
                           setEmail(event.target.value);
@@ -96,6 +97,7 @@ export default function SignIn() {
                       </Label>
                       <div className="relative">
                         <Input
+                        required
                           type={showPassword ? "text" : "password"}
                           onChange={(event) => {
                             setPassword(event.target.value);

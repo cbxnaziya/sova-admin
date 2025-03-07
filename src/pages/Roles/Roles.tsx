@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { checkPermission, getPagePermissions } from "../../utills/Services";
+import { useNavigate } from "react-router";
 
 
 interface Permission {
@@ -20,14 +22,29 @@ interface Role {
 
 
 export default function Roles() {
+  const navigate= useNavigate()
   const [roles, setRoles] = useState<Role[]>([]);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [addRole, setAddRole] = useState<Role>({ id: 0, _id: "", name: "", description: "", status: "active",permissions:[] });
   const [addRoleForm, setAddRoleForm] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
   const [authToken] = useState("Bearer YOUR_ACCESS_TOKEN");
+    const [permissions, setPermissions] = useState({
+      canView: false,
+      canCreate: false,
+      canEdit: false,
+      canDelete: false,
+    });
+  
 
   useEffect(() => {
+       const perms = getPagePermissions("Role");
+        setPermissions(perms);
+        
+        
+        if (!checkPermission("Role")) {
+         navigate("/404"); // Redirect to Page Not Found
+        }
     fetchRoles();
   }, []);
 
@@ -42,7 +59,7 @@ export default function Roles() {
     }
   };
   const permissionsList = ["view", "create", "edit", "delete"];
-const availablePages = ["Dashboard","User", "Role", "Customer", "Page", "Contact-Form", "Header", "Footer"];
+const availablePages = ["User", "Role", "Customer", "Page", "Contact-Form", "Header", "Footer"];
 const handleCheckboxChange = (page: string, action: string) => {
   setAddRole((prevRole) => {
     let updatedPermissions = [...prevRole.permissions];
@@ -219,7 +236,7 @@ setAddRole({ id: 0, _id: "", name: "", description: "", status: "active",permiss
 addRoleForm || editingRole ?
           <button className="btn btn-secondary mb-4 float-right" onClick={()=>{setAddRoleForm(false); setEditingRole(null)}}>Back </button>
 
-       :<button className="btn btn-dark mb-4 float-right" onClick={()=>{setAddRoleForm(true)}}>Add +</button>
+       :<button className="btn btn-dark mb-4 float-right" disabled={!permissions.canCreate} onClick={()=>{setAddRoleForm(true)}}>Add +</button>
         }
       </div>
       {editingRole ? (
@@ -346,16 +363,16 @@ addRoleForm || editingRole ?
                     ⋮
                   </button>
                   <ul className="dropdown-menu">
-                    <li>
+                  {permissions.canEdit &&  <li>
                       <button className="dropdown-item" onClick={() => handleEdit(role)}>Edit</button>
-                      <li>
+                      
                         <button className="dropdown-item" onClick={() => handleStatusToggle(role._id, role.status)}>
                           {role.status === "active" ? "Mark Inactive" : "Mark Active"}
                         </button>  
-                      </li>
-                    </li>
+                    
+                    </li>}
                     <li>
-                      <button className="dropdown-item text-danger" onClick={() => confirmDelete(role._id)}>Delete</button>
+                {permissions.canDelete &&      <button className="dropdown-item text-danger" onClick={() => confirmDelete(role._id)}>Delete</button>}
                     </li>
                   </ul>
                 </td>

@@ -176,6 +176,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
+import { checkPermission, getPagePermissions } from "../../utills/Services";
 
 interface User {
   id: number;
@@ -192,11 +194,28 @@ interface User {
 }
 
 export default function Customers() {
+  const navigate = useNavigate()
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    const [permissions, setPermissions] = useState({
+      canView: false,
+      canCreate: false,
+      canEdit: false,
+      canDelete: false,
+    });
+  
 
   useEffect(() => {
+         const perms = getPagePermissions("Customer");
+            setPermissions(perms);
+            
+
+    if (!checkPermission("Customer")) {
+         navigate("/404"); // Redirect to Page Not Found
+        }
+
+
     axios
     .get("https://sova-admin.cyberxinfosolution.com/admin/api/customer/all", {
     //  .get("http://localhost:5000/admin/api/users/all", {
@@ -322,6 +341,8 @@ export default function Customers() {
                       ⋮
                     </button>
                     <ul className="dropdown-menu">
+                     {permissions.canEdit && 
+                     <>
                       <li>
                         <button className="dropdown-item" onClick={() => handleEdit(user)}>Edit</button>
                       </li>
@@ -330,8 +351,10 @@ export default function Customers() {
                           {user.status === "active" ? "Mark Inactive" : "Mark Active"}
                         </button>
                       </li>
+                     </>
+                    }
                       <li>
-                        <button className="dropdown-item text-danger" onClick={() => setUserToDelete(user)}>Delete</button>
+               {  permissions.canDelete &&   <button className="dropdown-item text-danger" onClick={() => setUserToDelete(user)}>Delete</button>}
                       </li>
                     </ul>
                   {/* </div> */}

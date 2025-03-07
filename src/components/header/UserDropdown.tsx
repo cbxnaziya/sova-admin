@@ -4,9 +4,11 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
+
 export default function UserDropdown() {
   const   navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false);
+  const role = localStorage.getItem("role")
 
 
   function toggleDropdown() {
@@ -26,7 +28,7 @@ export default function UserDropdown() {
           <img src="/images/user/owner.png" alt="User" />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">Admin</span>
+        <span className="block mr-1 font-medium text-theme-sm">{role}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
@@ -55,10 +57,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-          Admin
+        {role}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-          admin@yopmail.com
+          Centralized dashboard for efficient administration.
           </span>
         </div>
 
@@ -88,7 +90,7 @@ export default function UserDropdown() {
               Edit profile
             </DropdownItem>
           </li>
-          <li>
+          {/* <li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
@@ -137,7 +139,7 @@ export default function UserDropdown() {
               </svg>
               Support
             </DropdownItem>
-          </li>
+          </li> */}
         </ul>
         <div
         onClick={()=>{

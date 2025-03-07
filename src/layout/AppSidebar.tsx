@@ -155,22 +155,36 @@ const AppSidebar: React.FC = () => {
     fetchPermissions();
   }, []);
 
-  const fetchPermissions = async () => {
+
+
+const fetchPermissions = async () => {
     try {
       const response = await api.get("/admin/api/users/permissions");
       // setPermissions(response.data.roles);
       const permissions = response.data.permissions
+
+      localStorage.setItem("permissions", JSON.stringify(permissions))
+      localStorage.setItem("role",response.data.role)
+
       console.log("responseresponse",response);
-      const allowedPages = permissions.map((p:any) => p.page);
+      // const allowedPages = permissions.map((p:any) => p.page);
+      const allowedPages = permissions
+  .filter((p: any) => p.actions.includes("view")) // Only pages where "view" is available
+  .map((p: any) => p.page);
+        allowedPages.push("Dashboard");
+        console.log("allowedPages", allowedPages);
+        
 const filteredNavItems = navItems.filter((item) => allowedPages.includes(item.name));
 setFilteredNavItems(filteredNavItems)
 
-console.log(filteredNavItems);
+console.log(filteredNavItems,"filter links");
       
     } catch (error) {
       console.error("Error fetching roles:", error);
     }
-  };
+};
+
+
 
   const isActive = useCallback(
     (path: string) => location.pathname === path,
