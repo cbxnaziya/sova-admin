@@ -207,6 +207,8 @@ export default function Customers() {
   
 
   useEffect(() => {
+    console.log("process.env.REACT_APP_API_URL", process.env.REACT_APP_API_URL);
+    
          const perms = getPagePermissions("Customer");
             setPermissions(perms);
             
@@ -217,8 +219,9 @@ export default function Customers() {
 
 
     axios
-    .get("https://sova-admin.cyberxinfosolution.com/admin/api/customer/all", {
-    //  .get("http://localhost:5000/admin/api/users/all", {
+    // .get("https://sova-admin.cyberxinfosolution.com/admin/api/customer/all", {
+      //  .get("http://localhost:5000/admin/api/users/all", {
+     .get(`${process.env.REACT_APP_API_URL}admin/api/customer/all`, {
         headers: {
           Authorization: `Bearer YOUR_ACCESS_TOKEN`,
         },

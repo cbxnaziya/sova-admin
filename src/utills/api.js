@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://sova-admin.cyberxinfosolution.com", // Set this in .env file
+  // baseURL: "http://localhost:5000", // Set this in .env file
+  // baseURL: "https://sova-admin.cyberxinfosolution.com", // Set this in .env file
+  baseURL: `${process.env.REACT_APP_API_URL}`, // Set this in .env file
   headers: {
     "Content-Type": "application/json",
   },

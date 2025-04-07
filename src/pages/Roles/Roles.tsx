@@ -50,7 +50,10 @@ export default function Roles() {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get("https://sova-admin.cyberxinfosolution.com/admin/api/roles/all", {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}admin/api/roles/all`
+        // "https://sova-admin.cyberxinfosolution.com/admin/api/roles/all"
+        , {
         headers: { Authorization: authToken },
       });
       setRoles(response.data.roles);

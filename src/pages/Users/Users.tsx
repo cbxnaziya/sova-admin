@@ -112,7 +112,7 @@ export default function Users() {
       // const url =  `${UPDATE_USER}/${editingRole._id}`;
       // const response = await fetchHandler( url, editingRole,true,setLoader,"PUT");
       const response = await axios.put(
-        `https://sova-admin.cyberxinfosolution.com/admin/api/users/${editingRole._id}`,
+        `${process.env.REACT_APP_API_URL}admin/api/users/${editingRole._id}`,
         editingRole,
         { headers: { Authorization: authToken } }
       );
