@@ -334,7 +334,9 @@ export default function Customers() {
                 <td>{user.account_name}</td>
                 <td>{user.email}</td>
                 <td>
-                  <button className={`btn btn-sm ${user.status === "active" ? "btn-outline-success" : "btn-outline-danger"}`} onClick={() => handleStatusToggle(user._id, user.status)}>
+                  <button className={`btn btn-sm ${user.status === "active" ? "btn-outline-success" : "btn-outline-danger"}`} 
+                  // onClick={() => handleStatusToggle(user._id, user.status)}
+                  >
                     {user.status}
                   </button>
                 </td>

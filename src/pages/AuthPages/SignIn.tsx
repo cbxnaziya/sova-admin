@@ -34,8 +34,8 @@ export default function SignIn() {
         }, 1000);
       }
     } catch (error: any) {
-      toast.error(error.response.data.message);
-      console.log("error", error.response.data.message);
+      toast.error(error?.response?.data?.message);
+      console.log("error", error?.response?.data?.message);
     }
   };
 
