@@ -32,19 +32,19 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    path: "/"
+    path: "/",
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
     icon: <UserCircleIcon />,
     name: "User",
-    path: "/users"
+    path: "/users",
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
     icon: <LockIcon />,
     name: "Role",
-    path: "/roles"
+    path: "/roles",
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   // {
@@ -60,8 +60,13 @@ const navItems: NavItem[] = [
   {
     name: "Customer",
     icon: <TableIcon />,
-    path: "/customers"
+    path: "/customers",
     // subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+  },
+  {
+    name: "CMS",
+    icon: <PageIcon />,
+    path: "/cms-page-manager"
   },
   {
     name: "Page",
@@ -98,9 +103,9 @@ const navItems: NavItem[] = [
     name: "Footer",
     path: "/footer",
   },
-    {
-    icon: <SettingIcon/> ,
-    
+  {
+    icon: <SettingIcon />,
+
     name: "Setting",
     path: "/profile",
   },
@@ -149,42 +154,39 @@ const AppSidebar: React.FC = () => {
     {}
   );
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [filteredNavItems, setFilteredNavItems] = useState<NavItem[]>([])
+  const [filteredNavItems, setFilteredNavItems] = useState<NavItem[]>([]);
 
   useEffect(() => {
     fetchPermissions();
   }, []);
 
-
-
-const fetchPermissions = async () => {
+  const fetchPermissions = async () => {
     try {
       const response = await api.get("/admin/api/users/permissions");
       // setPermissions(response.data.roles);
-      const permissions = response.data.permissions
+      const permissions = response.data.permissions;
 
-      localStorage.setItem("permissions", JSON.stringify(permissions))
-      localStorage.setItem("role",response.data.role)
+      localStorage.setItem("permissions", JSON.stringify(permissions));
+      localStorage.setItem("role", response.data.role);
 
-      console.log("responseresponse",response);
+      console.log("responseresponse", response);
       // const allowedPages = permissions.map((p:any) => p.page);
       const allowedPages = permissions
-  .filter((p: any) => p.actions.includes("view")) // Only pages where "view" is available
-  .map((p: any) => p.page);
-        allowedPages.push("Dashboard");
-        console.log("allowedPages", allowedPages);
-        
-const filteredNavItems = navItems.filter((item) => allowedPages.includes(item.name));
-setFilteredNavItems(filteredNavItems)
+        .filter((p: any) => p.actions.includes("view")) // Only pages where "view" is available
+        .map((p: any) => p.page);
+      allowedPages.push("Dashboard");
+      console.log("allowedPages", allowedPages);
 
-console.log(filteredNavItems,"filter links");
-      
+      const filteredNavItems = navItems.filter((item) =>
+        allowedPages.includes(item.name)
+      );
+      setFilteredNavItems(filteredNavItems);
+
+      console.log(filteredNavItems, "filter links");
     } catch (error) {
       console.error("Error fetching roles:", error);
     }
-};
-
-
+  };
 
   const isActive = useCallback(
     (path: string) => location.pathname === path,
@@ -378,7 +380,7 @@ console.log(filteredNavItems,"filter links");
         lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-    >
+    >  
       <div
         className={`py-8 flex ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
@@ -411,7 +413,7 @@ console.log(filteredNavItems,"filter links");
             />
           )}
         </Link>
-      </div>
+      </div> 
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
@@ -447,7 +449,7 @@ console.log(filteredNavItems,"filter links");
                   <HorizontaLDots />
                 )} */}
               </h2>
-            
+
               {renderMenuItems(othersItems, "others")}
             </div>
           </div>
