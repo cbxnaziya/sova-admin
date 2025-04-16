@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { checkPermission, getPagePermissions } from "../../utills/Services";
 import { useNavigate } from "react-router";
+import api from "../../utills/api";
 
 
 interface Permission {
@@ -50,12 +51,18 @@ export default function Roles() {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}admin/api/roles/all`
+      const response = await api.get(
+        `admin/api/roles/all`
         // "https://sova-admin.cyberxinfosolution.com/admin/api/roles/all"
         , {
         headers: { Authorization: authToken },
       });
+      // const response = await axios.get(
+      //   `${process.env.REACT_APP_API_URL}admin/api/roles/all`
+      //   // "https://sova-admin.cyberxinfosolution.com/admin/api/roles/all"
+      //   , {
+      //   headers: { Authorization: authToken },
+      // });
       setRoles(response.data.roles);
     } catch (error) {
       console.error("Error fetching roles:", error);
@@ -115,7 +122,7 @@ const handleCheckboxChange = (page: string, action: string) => {
     if (!editingRole) return;
     try {
       const response = await axios.put(
-        `https://sova-admin.cyberxinfosolution.com/admin/api/roles/${editingRole._id}`,
+        `${process.env.REACT_APP_API_URL}admin/api/roles/${editingRole._id}`,
         editingRole,
         { headers: { Authorization: authToken } }
       );
@@ -133,14 +140,14 @@ const handleCheckboxChange = (page: string, action: string) => {
     if (!addRole) return;
     try {
       const response = await axios.post(
-        `https://sova-admin.cyberxinfosolution.com/admin/api/roles/add`,
+        `${process.env.REACT_APP_API_URL}admin/api/roles/add`,
         addRole,
         { headers: { Authorization: authToken } }
       );
       setAddRoleForm(false)
       toast.success(response.data.message);
       setRoles([...roles, addRole]);
-setAddRole({ id: 0, _id: "", name: "", description: "", status: "active",permissions:[] })
+      setAddRole({ id: 0, _id: "", name: "", description: "", status: "active",permissions:[] })
       setEditingRole(null);
     } catch (error:any) {
       toast.error(error.response.data.message)
@@ -156,7 +163,7 @@ setAddRole({ id: 0, _id: "", name: "", description: "", status: "active",permiss
     if (!roleToDelete) return;
     try {
       const response = await axios.delete(
-        `https://sova-admin.cyberxinfosolution.com/admin/api/roles/${roleToDelete}`,
+        `${process.env.REACT_APP_API_URL}admin/api/roles/${roleToDelete}`,
         { headers: { Authorization: authToken } }
       );
       toast.success(response.data.message);
@@ -174,7 +181,7 @@ setAddRole({ id: 0, _id: "", name: "", description: "", status: "active",permiss
        
     try {
       const response = await axios.put(
-        `https://sova-admin.cyberxinfosolution.com/admin/api/roles/${userId}`,
+        `${process.env.REACT_APP_API_URL}admin/api/roles/${userId}`,
         { status: newStatus },
         {
           headers: {

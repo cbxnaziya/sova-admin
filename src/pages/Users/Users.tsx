@@ -96,33 +96,34 @@ export default function Users() {
     fetchRoles();
   }, []);
 
+  const fetchRoles = async () => {
+    try {
+      console.time("API Call Duration");
+
+      // const response = await axios.get("http://localhost:5000/admin/api/users/all", {
+      const response = await api.get("/admin/api/users/all", {
+        params: {
+          page,
+          limit,
+          sort,
+          search: searchParam,
+          // fromDate: startDate ,
+          // toDate: endDate ,
+          fromDate: startDate ? startDate.toISOString() : undefined,
+          toDate: endDate ? endDate.toISOString() : undefined,
+        },
+      });
+
+      console.timeEnd("API Call Duration");
+
+      setRoles(response?.data?.users);
+      setTotalPage(response?.data?.pages);
+    } catch (error: any) {
+      toast.error(error?.response?.data.message || "Failed to fetch users.");
+      console.error("Error fetching roles:", error);
+    }
+  };
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        console.time("API Call Duration");
-  
-        const response = await axios.get("http://localhost:5000/admin/api/users/all", {
-          params: {
-            page,
-            limit,
-            sort,
-            search: searchParam,
-            // fromDate: startDate ,
-            // toDate: endDate ,
-            fromDate: startDate ? startDate.toISOString() : undefined,
-            toDate: endDate ? endDate.toISOString() : undefined,
-          },
-        });
-  
-        console.timeEnd("API Call Duration");
-  
-        setRoles(response?.data?.users);
-        setTotalPage(response?.data?.pages);
-      } catch (error: any) {
-        toast.error(error?.response?.data.message || "Failed to fetch users.");
-        console.error("Error fetching roles:", error);
-      }
-    };
   
     fetchRoles();
   }, [page, limit, sort, searchParam, startDate, endDate,]);
@@ -163,15 +164,20 @@ export default function Users() {
 
     if (!addRole) return;
     try {
-      const response = await axios.post(
-        `https://sova-admin.cyberxinfosolution.com/admin/api/users/add`,
+      const response = await api.post(
+        `admin/api/users/add`,
         addRole,
         { headers: { Authorization: authToken } }
+      // const response = await axios.post(
+      //   `https://sova-admin.cyberxinfosolution.com/admin/api/users/add`,
+      //   addRole,
+      //   { headers: { Authorization: authToken } }
       );
       setAddRoleForm(false);
       toast.success(response.data.message);
       setRoles([...roles, addRole]);
       setEditingRole(null);
+      fetchRoles();
     } catch (error: any) {
       toast.error(error.response.data.message);
       console.error("Error updating role:", error);
@@ -319,7 +325,7 @@ export default function Users() {
           selectsRange
           startDate={startDate}
           endDate={endDate}
-          onChange={(update) => {
+          onChange={(update:any) => {
             const [start, end] = update;
             setStartDate(start);
             setEndDate(end);

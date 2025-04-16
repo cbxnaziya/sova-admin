@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { checkPermission, getPagePermissions } from "../../utills/Services";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import api from "../../utills/api";
 
 interface User {
   id: number;
@@ -53,7 +54,7 @@ export default function Customers() {
 
   const getCustomers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/admin/api/customer/all", {
+      const response = await api.get("admin/api/customer/all", {
         headers: {
           Authorization: `Bearer YOUR_ACCESS_TOKEN`,
         },
@@ -67,6 +68,20 @@ export default function Customers() {
           endDate: endDate ? endDate.toISOString() : undefined,
       
         }
+      // const response = await axios.get("http://localhost:5000/admin/api/customer/all", {
+      //   headers: {
+      //     Authorization: `Bearer YOUR_ACCESS_TOKEN`,
+      //   },
+      //   params: {
+      //     search,
+      //     sortBy,
+      //     order,
+      //     page,
+      //     limit,
+      //     startDate: startDate ? startDate.toISOString() : undefined,
+      //     endDate: endDate ? endDate.toISOString() : undefined,
+      
+      //   }
       });
     
       setUsers(response.data.customers);
@@ -83,7 +98,7 @@ export default function Customers() {
     if (editingUser) {
       try {
         const response = await axios.put(
-          `https://sova-admin.cyberxinfosolution.com/admin/api/customer/${editingUser._id}`,
+          `${process.env.REACT_APP_API_URL}admin/api/customer/${editingUser._id}`,
           editingUser,
           {
             headers: {
@@ -109,7 +124,7 @@ export default function Customers() {
 
     try {
       const response = await axios.put(
-        `https://sova-admin.cyberxinfosolution.com/admin/api/customer/${userId}`,
+        `${process.env.REACT_APP_API_URL}admin/api/customer/${userId}`,
         { status: newStatus },
         {
           headers: {
@@ -134,7 +149,7 @@ export default function Customers() {
     if (userToDelete) {
       try {
         const response = await axios.delete(
-          `https://sova-admin.cyberxinfosolution.com/admin/api/customer/${userToDelete._id}`,
+          `${process.env.REACT_APP_API_URL}admin/api/customer/${userToDelete._id}`,
           {
             headers: {
               Authorization: `Bearer YOUR_ACCESS_TOKEN`,
@@ -204,7 +219,7 @@ export default function Customers() {
                         selectsRange
                         startDate={startDate}
                         endDate={endDate}
-                        onChange={(update) => {
+                        onChange={(update:any) => {
                           const [start, end] = update;
                           setStartDate(start);
                           setEndDate(end);

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { capitalizeFirstLetter, checkPermission, getPagePermissions } from "../../utills/Services";
 import {  useNavigate } from "react-router";
+import api from "../../utills/api";
 
 interface ContactSubmission {
   _id: string;
@@ -40,7 +41,7 @@ interface ContactSubmission {
 
   const fetchSubmissions = async () => {
     try {
-      const response = await axios.get("https://sova-admin.cyberxinfosolution.com/admin/api/contact", {
+      const response = await api.get("admin/api/contact", {
         headers: { Authorization: authToken },
       });
 
@@ -61,7 +62,7 @@ interface ContactSubmission {
     // const newStatus = currentStatus === "New" ? "Resolved" : "New";
     try {
       await axios.put(
-        `https://sova-admin.cyberxinfosolution.com/admin/api/contact/update/${id}`,
+        `${process.env.REACT_APP_API_URL}admin/api/contact/update/${id}`,
         { status: newStatus },
         { headers: { Authorization: authToken } }
       );
