@@ -69,7 +69,7 @@ export default function Roles() {
     }
   };
   const permissionsList = ["view", "create", "edit", "delete"];
-const availablePages = ["User", "Role", "Customer", "Page","CMS", "Contact-Form", "Header", "Footer"];
+const availablePages = ["User", "Role", "Customer", "Pages","CMS","Home", "Contact-Form", "Header", "Footer"];
 const handleCheckboxChange = (page: string, action: string) => {
   setAddRole((prevRole) => {
     let updatedPermissions = [...prevRole.permissions];

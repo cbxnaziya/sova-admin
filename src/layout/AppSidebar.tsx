@@ -64,22 +64,27 @@ const navItems: NavItem[] = [
     // subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
   },
   {
-    name: "CMS",
+    name: "Pages",
     icon: <PageIcon />,
     path: "/cms-page-manager"
   },
   {
-    name: "Page",
+    name: "Home",
     icon: <PageIcon />,
-    subItems: [
-      { name: "Home", path: "/blank", pro: false },
-      { name: "About Us", path: "/blank", pro: false },
-      { name: "Services", path: "/blank", pro: false },
-      { name: "Blogs", path: "/blank", pro: false },
-      { name: "Careers", path: "/blank", pro: false },
-      { name: "404 Error", path: "/404", pro: false },
-    ],
+    path: "/cms-home"
   },
+  // {
+  //   name: "Page",
+  //   icon: <PageIcon />,
+  //   subItems: [
+  //     { name: "Home", path: "/blank", pro: false },
+  //     { name: "About Us", path: "/blank", pro: false },
+  //     { name: "Services", path: "/blank", pro: false },
+  //     { name: "Blogs", path: "/blank", pro: false },
+  //     { name: "Careers", path: "/blank", pro: false },
+  //     { name: "404 Error", path: "/404", pro: false },
+  //   ],
+  // },
   {
     icon: <UserCircleIcon />,
     name: "User Profile",

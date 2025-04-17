@@ -64,7 +64,7 @@ export default function App() {
               <Route path="/buttons" element={<Buttons />} />
               <Route path="/images" element={<Images />} />
               <Route path="/videos" element={<Videos />} />
-              <Route path="/cms" element={<HomeCMS />} /> 
+              <Route path="/cms-home" element={<HomeCMS />} /> 
               <Route path="/cms-page-manager" element={<CMSPageManager />} /> 
             </Route>
           </Route>
